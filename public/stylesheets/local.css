@@ -1,0 +1,159 @@
+.r {
+    text-align: right
+}
+
+.mb_0_5em {
+    margin-bottom: 0.5em !important
+}
+
+.mt_1em {
+    margin-top: 0.5em !important
+}
+
+.mt_2em {
+    margin-top: 2em !important
+}
+
+.c {
+    text-align: center;
+}
+
+.b {
+    font-weight: bold;
+}
+
+.grey {
+    background-color: #f0f0f0;
+    padding-left: 5px
+}
+
+.rpad {
+    margin-right: 2px !important;
+    font-family: "Courier New";
+    font-weight: 600;
+    /*font-size: 16px;*/
+    padding: 4px 4px 3px 3px;
+}
+
+.nodecorate {
+    text-decoration: none;
+    color: #000
+}
+
+.mauve {
+    background-color: #dbdceb;
+}
+
+.blue {
+    background-color: #cae2f0;
+}
+
+.green {
+    background-color: #c9e8e5;
+}
+
+.govuk-table--m td, .govuk-table--m th {
+    font-size: 16px !important;
+}
+
+.govuk-table.sticky th[scope=col] {
+    position: sticky !important;
+    top: 0 !important;
+    background-color: #fff;
+    background-image: url('/govuk/assets/images/shim_grey.png');
+    background-repeat: repeat-x;
+    background-position: bottom;
+    border: 0px;
+}
+
+th {
+    vertical-align: bottom !important;
+}
+
+.nr {
+    white-space: nowrap;
+}
+
+.f {
+    float: left;
+}
+
+.fr {
+    float: right;
+}
+
+.clearer {
+    clear: both;
+    max-height: 1px;
+    height: 1px;
+    display: block;
+    float: none;
+}
+
+img.icon {
+    padding: 3px 8px 0px 0px;
+}
+
+img.icon2 {
+    display: inline-block;
+    padding-left: 12px;
+    top: 4px;
+    position: relative;
+}
+
+div.c1 {
+    width: 10%;
+}
+
+div.c2 {
+    width: 65%;
+}
+
+div.c3 {
+    padding-left: 0.5em;
+    min-width: 44px;
+    width: 14%;
+    text-align: right;
+}
+
+div.c1b {
+    width: 8%;
+}
+
+div.c2b {
+    width: 70%;
+}
+
+div.c3b {
+    min-width: 44px;
+    width: 20%;
+    text-align: right;
+}
+
+div.w100 {
+    width: 100%;
+}
+
+.w30 {
+    width: 30%
+}
+
+.w70 {
+    width: 70%
+}
+
+table.horizontal tr td label {
+    padding-top: 8px;
+}
+
+table.govuk-table--m p.govuk-body {
+    font-size: 16px;
+}
+
+ol.govuk-list--m, ul.govuk-list--m, ol.govuk-list--m li, ul.govuk-list--m li {
+    font-size: 16px !important;
+    width:100%;
+}
+i.far {
+    padding-left:1em;
+}

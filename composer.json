@@ -1,0 +1,9 @@
+{
+    "require": {
+        "pflorek/php-basic-auth": "^1.0"
+    },
+    "require-dev": {
+        "pflorek/php-basic-auth": "^1.0",
+        "heroku/heroku-buildpack-php": "*"
+    }
+}
