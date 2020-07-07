@@ -36,8 +36,8 @@ date_default_timezone_set("Europe/London");
 $pagesize = 100;
 
 $server_name = $_SERVER["SERVER_NAME"];
-pre ($server_name);
-if ($server_name == "https://stwss.herokuapp.com") {
+//pre ($server_name);
+if ($server_name == "stwss.herokuapp.com") {
     $credentials = parse_url(getenv("DATABASE_URL"));
     pre ($credentials);
     $host = $credentials['host'];
