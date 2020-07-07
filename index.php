@@ -3,7 +3,7 @@
     $app = new application();
 ?>
 <!DOCTYPE html>
-<html lang="en" class="govuk-template ">
+<html lang="en" class="govuk-template">
 <?php
     $page_title = "Main menu";
     require("./includes/meta.php");

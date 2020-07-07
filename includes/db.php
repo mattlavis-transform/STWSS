@@ -1,5 +1,4 @@
 <?php
-require("p.php");
 // Classes
 require(dirname(__FILE__) . "../../classes/application.php");
 require(dirname(__FILE__) . "../../classes/certificate.php");
@@ -39,12 +38,13 @@ $server_name = $_SERVER["SERVER_NAME"];
 //pre ($server_name);
 if ($server_name == "stwss.herokuapp.com") {
     $credentials = parse_url(getenv("DATABASE_URL"));
-    pre ($credentials);
+    //pre ($credentials);
     $host = $credentials['host'];
     $dbase = trim($credentials['path'], '/');
     $dbuser = $credentials['user'];
     $pwd = $credentials['pass'];
 } else {
+    require("p.php");
     $host = $host_local;
     $dbase = $dbase_local;
     $dbuser = $dbuser_local;
