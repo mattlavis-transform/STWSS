@@ -37,10 +37,9 @@ $pagesize = 100;
 
 $server_name = $_SERVER["SERVER_NAME"];
 
-if ($server_name == "tariff-prototype.london.cloudapps.digital") {
-    $dbCredentialsUrl = $_ENV['DATABASE_URL'];
-    $credentials = parse_url($dbCredentialsUrl);
-
+if ($server_name == "https://stwss.herokuapp.com") {
+    $credentials = parse_url(getenv("DATABASE_URL"));
+    pre ($credentials);
     $host = $credentials['host'];
     $dbase = trim($credentials['path'], '/');
     $dbuser = $credentials['user'];
@@ -51,9 +50,7 @@ if ($server_name == "tariff-prototype.london.cloudapps.digital") {
     $dbuser = $dbuser_local;
     $pwd = $pwd_local;
 }
-$dbase_eu = "tariff_eu";
 $conn = pg_connect("host=" . $host . " port=5432 dbname=" . $dbase . " user=" . $dbuser . " password=" . $pwd);
-$conn_eu = pg_connect("host=" . $host . " port=5432 dbname=" . $dbase_eu . " user=" . $dbuser . " password=" . $pwd);
 
 $page = intval(get_querystring("page"));
 if ($page == 0) {

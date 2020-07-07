@@ -18,8 +18,6 @@
 ?>
     <div class="govuk-width-container ">
 <?php
-        $db = parse_url(getenv("DATABASE_URL"));
-        pre($db);
         $app->crumb_string = "";
         require("./includes/crumb.php");
 ?>
