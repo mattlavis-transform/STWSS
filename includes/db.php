@@ -39,7 +39,7 @@ $server_name = $_SERVER["SERVER_NAME"];
 //pre ($server_name);
 if ($server_name == "stwss.herokuapp.com") {
     $credentials = parse_url(getenv("DATABASE_URL"));
-    pre ($credentials);
+    //pre ($credentials);
     $host = $credentials['host'];
     $dbase = trim($credentials['path'], '/');
     $dbuser = $credentials['user'];
