@@ -39,7 +39,7 @@ $server_name = $_SERVER["SERVER_NAME"];
 //pre ($server_name);
 if ($server_name == "stwss.herokuapp.com") {
     $credentials = parse_url(getenv("DATABASE_URL"));
-    //pre ($credentials);
+    pre ($credentials);
     $host = $credentials['host'];
     $dbase = trim($credentials['path'], '/');
     $dbuser = $credentials['user'];
@@ -51,7 +51,7 @@ if ($server_name == "stwss.herokuapp.com") {
     $pwd = $pwd_local;
 }
 $conn = pg_connect("host=" . $host . " port=5432 dbname=" . $dbase . " user=" . $dbuser . " password=" . $pwd);
-
+die();
 $page = intval(get_querystring("page"));
 if ($page == 0) {
     $page = 1;
