@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html lang="en" class="govuk-template">
 <?php
-    pre ($_SERVER['DOCUMENT_ROOT']);
+    //pre ($_SERVER['DOCUMENT_ROOT']);
     $page_title = "Main menu";
     require("./includes/meta.php");
 ?>
