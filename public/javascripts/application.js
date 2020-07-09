@@ -73,7 +73,7 @@ $(document).ready(function () {
         url = "/api/subheaders.php?header_id=" + header_id;
         var data = getJson(url);
         var results = data.results;
-        console.log(results);
+        //console.log(results);
         if (results.length == 0) {
             // There are no valid suheaders
             $("#subheader").val("Unspecified");
@@ -81,12 +81,12 @@ $(document).ready(function () {
         } else {
             $("#subheader").prop("disabled", false);
             var options = $('#subheader').prop('options');
-            console.log (options);
+            //console.log (options);
             $("#subheader option[value!='0']").each(function () {
                 $(this).remove();
             });
             $.each(results, function () {
-                console.log ("Here");
+                //console.log ("Here");
                 options[options.length] = new Option(this.description, this.id);
             });
         }

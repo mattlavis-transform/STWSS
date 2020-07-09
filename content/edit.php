@@ -80,7 +80,7 @@ require("../includes/meta.php");
                             new textarea("step_howto_description", "Explanatory text", "Optionally, add some explanatory text to advise users further", false, 2, $content->step_howto_description);
                             new textarea("step_url", "URL", "Please enter the full URL including the https://", false, 2, $content->step_url);
                             new select("header", $app->headers, "Select the heading to which this content belongs", "", false, $content->header_id);
-                            new select("subheader", $app->subheaders, "Select the subheading to which this content belongs", "<span class='red'>There needs to be some logic to link a subheading to a heading - not currently in the data model.</span>", false, $content->subheader_id);
+                            new select("subheader", $app->subheaders, "Select the subheading to which this content belongs", "", false, $content->subheader_id);
                             //new input("country_exclusions", "Country exclusions", "Optionally, enter a comma-delimited list of 2-digit country codes to which this content does not apply", false, $content->country_exclusions, "", "");
                             new hidden("id", $content->id);
                             new hidden("country_exclusions", "");
