@@ -157,3 +157,6 @@ ol.govuk-list--m, ul.govuk-list--m, ol.govuk-list--m li, ul.govuk-list--m li {
 i.far {
     padding-left:1em;
 }
+.red {
+    color:#cc0000 !important;
+}

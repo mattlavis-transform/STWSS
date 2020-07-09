@@ -76,13 +76,14 @@ require("../includes/meta.php");
                                 $content->subheader_id = get_session_variable("subheader_id");
                                 $content->country_exclusions = get_session_variable("country_exclusions");
                             }
-                            new textarea("step_description", "Step title", "", false, 3, $content->step_description);
-                            new textarea("step_howto_description", "Explanatory text", "", false, 2, $content->step_howto_description);
+                            new textarea("step_description", "Step title", "This is the content which will be displayed in the step's hyperlink", false, 3, $content->step_description);
+                            new textarea("step_howto_description", "Explanatory text", "Optionally, add some explanatory text to advise users further", false, 2, $content->step_howto_description);
                             new textarea("step_url", "URL", "Please enter the full URL including the https://", false, 2, $content->step_url);
                             new select("header", $app->headers, "Select the heading to which this content belongs", "", false, $content->header_id);
-                            new select("subheader", $app->subheaders, "Select the subheading to which this content belongs", "", false, $content->subheader_id);
-                            new input("country_exclusions", "Country exclusions", "Optionally, enter a comma-delimited list of 2-digit country codes to which this content does not apply", false, $content->country_exclusions, "", "");
+                            new select("subheader", $app->subheaders, "Select the subheading to which this content belongs", "<span class='red'>There needs to be some logic to link a subheading to a heading - not currently in the data model.</span>", false, $content->subheader_id);
+                            //new input("country_exclusions", "Country exclusions", "Optionally, enter a comma-delimited list of 2-digit country codes to which this content does not apply", false, $content->country_exclusions, "", "");
                             new hidden("id", $content->id);
+                            new hidden("country_exclusions", "");
                             new hidden("sid", $app->sid);
                             new hidden("identifier", $app->identifier);
                             if ($content->id == "") {

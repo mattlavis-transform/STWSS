@@ -6,6 +6,8 @@ class application
     public $page_title;
     public $url;
     public $crumb_string = "";
+    public $linkage_url = "";
+    public $free_text = "";
     public $delimiter = "||";
     public $link_type = "";
     public $certificates = array();
@@ -27,11 +29,12 @@ class application
     public $content_linking_methods = array();
     public $yes_no = array();
     public $error_array = array();
+    public $found_content = array();
     public $err = 0;
 
     function __construct()
     {
-        $this->application_name = "Smart Signposting Content Management";
+        $this->application_name = "Smart Signposting Data Management";
         $this->url = $_SERVER['PHP_SELF'];
         array_push($this->yes_no, new data_item("yes", "Yes"));
         array_push($this->yes_no, new data_item("no", "No"));
@@ -48,8 +51,6 @@ class application
         try {
             echo ("Called from function <b>" . debug_backtrace()[1]['function'] . "</b>");
         } catch (exception $e) {
-            
-            
         }
         pre($_REQUEST);
         ini_set('display_errors', true);
@@ -519,7 +520,8 @@ class application
         }
     }
 
-    public function check_for_errors() {
+    public function check_for_errors()
+    {
         $this->err = get_querystring("err");
         if ($this->err == "1") {
             $this->data_encrypted = get_querystring("data");
@@ -545,5 +547,64 @@ class application
             $msg = "Error message not found";
         }
         return ($msg);
+    }
+
+    function find_content()
+    {
+        global $conn;
+        $this->free_text = get_querystring("free_text");
+        $free_text = "%" . $this->free_text . "%";
+        $this->link_type = get_querystring("link_type");
+        $this->sid = get_querystring("sid");
+        $this->id = get_querystring("id");
+
+        $command = uniqid();
+        $sql = "select * from signposting_steps ss
+        where ss.step_description ilike $1
+        or ss.step_howto_description ilike $1
+        or ss.step_url ilike $1
+        order by step_description";
+        pg_prepare($conn, $command, $sql);
+        $result = pg_execute($conn, $command, array($free_text));
+        $this->found_content = array();
+        $row_count = pg_num_rows($result);
+        if ($result) {
+            while ($row = pg_fetch_array($result)) {
+                $c = new content;
+                $c->id = $row['id'];
+                $c->step_description = $row['step_description'];
+                $c->step_howto_description = $row['step_howto_description'];
+                $c->step_url = $row['step_url'];
+                $c->header_id = $row['header_id'];
+                $c->subheader_id = $row['subheader_id'];
+                array_push($this->found_content, $c);
+            }
+        }
+    }
+
+    function get_linkage_url($content_id)
+    {
+        $this->linkage_url = "/includes/routes.php?action=create_content_linkage&id=" . $content_id . "&link_type=" . $this->link_type; //&section=$app->sid";
+
+        switch ($this->link_type) {
+            case "section":
+                $this->linkage_url .= "&section=" . $this->sid;
+                break;
+            case "chapter":
+                $this->linkage_url .= "&chapter=" . $this->sid;
+                break;
+            case "commodity":
+                $this->linkage_url .= "&commodity=" . $this->sid;
+                break;
+            case "measure_type":
+                $this->linkage_url .= "&measure_type=" . $this->sid;
+                break;
+            case "document_code":
+                $this->linkage_url .= "&document_code=" . $this->sid;
+                break;
+            case "trade_type":
+                $this->linkage_url .= "&trade_type=" . $this->sid;
+                break;
+        }
     }
 }

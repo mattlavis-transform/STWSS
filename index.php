@@ -34,7 +34,8 @@
                     <h2 class="govuk-heading-m">Tariff entities</h2>
                     <p class="govuk-body"><a href="/sections">Sections</a></p>
                     <p class="govuk-body"><a href="/chapters">Chapters</a></p>
-                    <p class="govuk-body"><a href="/commodities">Commodity codes</a></p>
+                    <p class="govuk-body"><a href="/headings">Headings</a> (incomplete)</p>
+                    <p class="govuk-body"><a href="/commodities">Commodity codes</a> (incomplete)</p>
                     <p class="govuk-body"><a href="/measure_types">Measure types</a></p>
                     <p class="govuk-body"><a href="/document_codes">Document codes</a></p>
                     <p class="govuk-body"><a href="/trade_types">Trade types</a></p>

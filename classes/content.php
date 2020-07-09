@@ -25,12 +25,6 @@ class content
         global $conn, $app;
 
         $this->id = get_querystring("id");
-        /*
-        if ($this->id == "") {
-            $url = "/content/";
-            header("Location: " . $url);
-        }
-        */
         if ($this->id == "") {
             $this->edit_page_title = "Create new content item " . $this->id;
             $this->button_face = "Create content item";
@@ -187,7 +181,7 @@ class content
             $id, $chapter
         ));
     }
-    
+
     public function link_document_code()
     {
         //application::debug();
@@ -205,7 +199,7 @@ class content
         ));
     }
 
-    
+
     public function link_measure_type()
     {
         application::debug();
@@ -222,7 +216,7 @@ class content
             $id, $chapter
         ));
     }
-    
+
     public function link_trade_type()
     {
         application::debug();
@@ -383,13 +377,7 @@ class content
 
     function update()
     {
-    }
-
-    function create()
-    {
-        //application::debug();
-        global $conn, $app;
-
+        global $conn;
         $this->step_description = get_request("step_description");
         $this->step_howto_description = get_request("step_howto_description");
         $this->step_url = get_request("step_url");
@@ -399,13 +387,55 @@ class content
         $this->parse_country_exclusions();
 
         // Do the validation
+        $this->validate();
+
+        $link_type = get_request("link_type");
+        $id = get_request("id");
+        //application::debug();
+
+
+        // Insert the step
+        $sql = "UPDATE signposting_steps SET
+        step_description = $1,
+        step_howto_description = $2,
+        step_url = $3,
+        header_id = $4,
+        subheader_id = $5 
+        WHERE id = $6";
+        $command = uniqid();
+        pg_prepare($conn, $command, $sql);
+        $result = pg_execute($conn, $command, array(
+            $this->step_description,
+            $this->step_howto_description,
+            $this->step_url,
+            $this->header_id,
+            $this->subheader_id,
+            $id
+        ));
+
+        // Then redirect to the confirmation page
+        $c = new confirmation();
+        $c->panel_title = "Content item " . $id . " has been successfully updated";
+        $c->panel_body = "";
+        $c->step1 = "<a class='govuk-link' href='/content/edit.html?id=" . $id . "'>View this content item</a>";
+        $c->step2 = "<a class='govuk-link' href='/content'>View all content</a>";
+        $c->encrypt_data();
+        $url = "/includes/confirm.html?data=" . $c->data_encrypted;
+        header("Location: " . $url);
+
+    }
+
+    function validate()
+    {
+        // Do the validation
         $this->errors = array();
         if ($this->step_description == "") {
             array_push($this->errors, "step_description");
         }
+        /*
         if ($this->step_howto_description == "") {
             array_push($this->errors, "step_howto_description");
-        }
+        }*/
         if ($this->step_url == "") {
             array_push($this->errors, "step_url");
         }
@@ -434,6 +464,23 @@ class content
             header("Location: " . $url);
             return;
         }
+    }
+
+    function create()
+    {
+        //application::debug();
+        global $conn, $app;
+
+        $this->step_description = get_request("step_description");
+        $this->step_howto_description = get_request("step_howto_description");
+        $this->step_url = get_request("step_url");
+        $this->header_id = get_request("header");
+        $this->subheader_id = get_request("subheader");
+        $this->country_exclusions = get_request("country_exclusions");
+        $this->parse_country_exclusions();
+
+        // Do the validation
+        $this->validate();
 
         $link_type = get_request("link_type");
         $sid = get_request("sid");
@@ -456,7 +503,7 @@ class content
             $row = pg_fetch_row($result);
             $id = $row[0];
         }
-        h1(count($this->country_exclusion_list));
+
         // Insert the country exclusions, if needed
         if (count($this->country_exclusion_list) > 0) {
             foreach ($this->country_exclusion_list as  $country_code) {
