@@ -37,6 +37,7 @@ require("../includes/meta.php");
                         </summary>
                         <div class="govuk-details__text">
                             Please select the criteria on which to filter the content database<br />
+                            <span class="red">This is for show only and needs to be 'designed'</span>
                             <form novalidate>
                                 <table class="govuk-table govuk-table--m horizontal">
                                     <tbody class="govuk-table__body">

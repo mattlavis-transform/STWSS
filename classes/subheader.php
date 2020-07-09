@@ -2,6 +2,7 @@
 class subheader
 {
     // Class properties and methods go here
-    public $id          = "";
+    public $id          = null;
+    public $header_id   = null;
     public $description = "";
 }

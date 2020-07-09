@@ -20,4 +20,5 @@
     <script src="https://kit.fontawesome.com/8f76f2c92c.js" crossorigin="anonymous"></script>
 
     <meta property="og:image" content="/govuk/assets/images/govuk-opengraph-image.png">
+    <script type="javascript" src="/public/javascripts/jquery-3.5.1.min.js"></script>
 </head>

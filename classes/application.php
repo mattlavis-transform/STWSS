@@ -351,14 +351,15 @@ class application
     public function get_subheaders()
     {
         global $conn;
-        $sql = "select id, subheader_description as description from signposting_step_subheaders order by 1";
+        $sql = "select id, subheader_description as description, header_id from signposting_step_subheaders order by 1";
         $result = pg_query($conn, $sql);
         $this->subheaders = array();
         if ($result) {
             while ($row = pg_fetch_array($result)) {
-                $obj = new header;
+                $obj = new subheader;
                 $obj->id = $row['id'];
                 $obj->description = $row['description'];
+                $obj->header_id = $row['header_id'];
                 array_push($this->subheaders, $obj);
             }
         }
