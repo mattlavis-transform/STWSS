@@ -6,6 +6,7 @@ $commodity->goods_nomenclature_item_id = get_querystring("goods_nomenclature_ite
 $commodity->productline_suffix = get_querystring("productline_suffix");
 $commodity->get_details();
 $commodity->get_hierarchy();
+$commodity->get_signposting_steps();
 $commodity->get_document_codes();
 $commodity->get_import_measures();
 ?>
@@ -34,6 +35,100 @@ require("../includes/meta.php");
                 <div class="govuk-grid-column-full">
                     <h1 class="govuk-heading-l">Commodity <?= $commodity->goods_nomenclature_item_id ?></h1>
 
+                    <div class="govuk-tabs" data-module="govuk-tabs">
+                        <h2 class="govuk-tabs__title">
+                            Contents
+                        </h2>
+                        <ul class="govuk-tabs__list">
+                            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+                                <a class="govuk-tabs__tab" href="#commodity_details">
+                                    Details
+                                </a>
+                            </li>
+                            <li class="govuk-tabs__list-item">
+                                <a class="govuk-tabs__tab" href="#content">
+                                    Content
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="govuk-tabs__panel" id="commodity_details">
+                            <h2 class="govuk-heading-l">Commodity details</h2>
+
+                            <table class="govuk-table govuk-table--m">
+                                <tbody class="govuk-table__body">
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__cell">Commodity</td>
+                                        <td class="govuk-table__cell"><?= format_goods_nomenclature_item_id($commodity->goods_nomenclature_item_id) ?></td>
+                                    </tr>
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__cell"><abbr title="Product line suffix">PLS</abbr></td>
+                                        <td class="govuk-table__cell"><?= $commodity->productline_suffix ?></td>
+                                    </tr>
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__cell">Description</td>
+                                        <td class="govuk-table__cell"><?= $commodity->description ?></td>
+                                    </tr>
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__cell">Indents</td>
+                                        <td class="govuk-table__cell"><?= $commodity->number_indents ?></td>
+                                    </tr>
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__cell">Hierarchy</td>
+                                        <td class="govuk-table__cell"><?= $commodity->hierarchy_string ?></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="govuk-tabs__panel" id="content">
+                            <h2 class="govuk-heading-l">Content</h2>
+                            <?php
+                            if (count($commodity->content) == 0) {
+                                echo ("<p class='govuk-body'>There is no content attached to this commodity.");
+                            } else {
+                            ?>
+                                <table class="govuk-table govuk-table--m">
+                                    <thead class="govuk-table__head">
+                                        <tr class="govuk-table__row">
+                                            <th scope="col" class="govuk-table__header">ID</th>
+                                            <th scope="col" class="govuk-table__header">Description</th>
+                                            <th scope="col" class="govuk-table__header">Explanatory text</th>
+                                            <th scope="col" class="govuk-table__header">URL</th>
+                                            <th scope="col" class="govuk-table__header r">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="govuk-table__body">
+                                        <?php
+                                        foreach ($commodity->content as $c) {
+                                        ?>
+                                            <tr class="govuk-table__row">
+                                                <td class="govuk-table__cell"><?= $c->id ?></td>
+                                                <td class="govuk-table__cell"><?= $c->step_description ?></td>
+                                                <td class="govuk-table__cell"><?= $c->step_howto_description ?></td>
+                                                <td class="govuk-table__cell"><a target="_blank" href='<?= $c->step_url ?>'><?= $c->step_url ?></a></td>
+                                                <td class="govuk-table__cell r">
+                                                    <a href="/content/edit.html?id=<?= $c->id ?>" title="Edit content item <?= $c->id ?>"><i class="far fa-edit"></i></a>
+                                                    <a href="/includes/routes.php?action=delete_content_linkage&src=entity&link_type=section&id=<?= $section->id ?>&sid=<?= $c->unique_id ?>" title="Remove content item <?= $c->id ?> from section <?= $section->numeral ?>"><i class='fas fa-trash-alt'></i></a>
+                                                </td>
+                                            </tr>
+                                        <?php
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
+                            <?php
+                            }
+                            ?>
+                            <p class="govuk-body"><a href="/content/add.html?link_type=commodity&sid=<?= $commodity->goods_nomenclature_item_id ?>&id=<?= $commodity->goods_nomenclature_item_id?>">Add content to commodity <?= $commodity->goods_nomenclature_item_id ?></a></p>
+                        </div>
+
+                    </div>
+
+                    <!--
+                    <div class="govuk-tabs__panel" id="commodity_details">
+                            <h2 class="govuk-heading-l">Commodity details</h2>
+
+                        </div>
 
                     <div class="govuk-tabs" data-module="govuk-tabs">
                         <h2 class="govuk-tabs__title">
@@ -173,7 +268,6 @@ require("../includes/meta.php");
                                     </tr>
                                 </tbody>
                             </table>
-
                         </div>
                         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="import_docs">
                             <h2 class="govuk-heading-l">Import documentation</h2>
@@ -261,7 +355,7 @@ require("../includes/meta.php");
                         </div>
 
                     </div>
-
+                    //-->
                 </div>
             </div>
         </main>

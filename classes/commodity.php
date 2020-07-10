@@ -13,10 +13,13 @@ class commodity
     public $hierarchy_string = "";
     public $import_measures = array();
     public $export_measures = array();
+    public $content = array();
 
     public function get_details()
     {
-        global $conn;
+        $root = "https://www.trade-tariff.service.gov.uk/api/v2/headings/";
+        $url = $root . substr($this->goods_nomenclature_item_id, 0, 4);
+    global $conn;
         $sql = "select goods_nomenclature_sid, goods_nomenclature_item_id, productline_suffix,
         description, number_indents, declarable 
         from goods_nomenclatures gn where goods_nomenclature_item_id = $1
@@ -55,6 +58,11 @@ class commodity
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $output = curl_exec($curl);
         $json = json_decode($output, true);
+
+        // get the detais
+        $this->description = $json["data"]["attributes"]["formatted_description"];
+        $this->number_indents = $json["data"]["attributes"]["number_indents"];
+        
         // Get the relationships
         $relationships = $json["data"]["relationships"];
         $section_id = $relationships["section"]["data"]["id"];
@@ -103,18 +111,27 @@ class commodity
         $indent = "&nbsp;&nbsp;&nbsp;";
         $mark = "-&nbsp;";
         $indent_count = 0;
+        //pre($this->hierarchies);
         foreach ($this->hierarchies as $h) {
+            /*
             $this->hierarchy_string .= str_repeat($indent, $indent_count);
             if ($indent_count > 0) {
                 $this->hierarchy_string .= $mark;
             }
-            /*
-            if ($h->type == "commodity") {
-                $this->hierarchy_string .= "<a class='govuk-link' href='/commodities/view.html?productline_suffix=" . $h->productline_suffix . "&goods_nomenclature_item_id=" . $h->goods_nomenclature_item_id . "'>" . $h->description . "</a><br />";
-            } else {
-            }
             */
-            $this->hierarchy_string .= format_goods_nomenclature_item_id($h->goods_nomenclature_item_id) . $h->description . "<br />";
+            switch ($h->type) {
+                case "section":
+                    $this->hierarchy_string .= "<div class='c1'>Section " . $h->goods_nomenclature_item_id . "</div><div class='c2'>" . $h->description . "</div>";
+                    break;
+                case "chapter":
+                    $this->hierarchy_string .= "<div class='c1'>Chapter " . substr($h->goods_nomenclature_item_id, 0, 2) . "</div><div class='c2'>" . $h->description . "</div>";
+                    break;
+                case "commodity":
+                    $this->hierarchy_string .= "<div class='c1'>" . $h->formatted_commodity() . "</div><div class='c2'>" . $h->description . "</div>";
+                    break;
+            }
+
+            //$this->hierarchy_string .= $h->goods_nomenclature_item_id . "&nbsp;" . $h->description . "<br />";
             $indent_count += 1;
         }
     }
@@ -173,6 +190,39 @@ class commodity
                 $certificate->document_code = $row["document_code"];
                 $certificate->description = $row["requirement"];
                 array_push($this->certificates, $certificate);
+            }
+        }
+    }
+
+    public function get_signposting_steps()
+    {
+        global $conn;
+        $sql = "select ssca.id as unique_id, ss.id, ss.step_description, ss.step_howto_description,
+        ss.step_url, ss.header_id, ss.subheader_id, ssh.header_description, sss.subheader_description 
+        from signposting_step_commodity_assignment ssca, signposting_steps ss, signposting_step_headers ssh, signposting_step_subheaders sss 
+        where ss.id = ssca.signposting_step_id 
+        and ss.header_id = ssh.id 
+        and ss.subheader_id = sss.id 
+        and code = $1
+        order by ss.id;
+        ";
+        pg_prepare($conn, "get_signposting_steps", $sql);
+        $result = pg_execute($conn, "get_signposting_steps", array($this->goods_nomenclature_item_id));
+        $row_count = pg_num_rows($result);
+        if (($result) && ($row_count > 0)) {
+            while ($row = pg_fetch_array($result)) {
+                $content = new content();
+                $content->unique_id = $row['unique_id'];
+                $content->id = $row['id'];
+                $content->step_description = $row['step_description'];
+                $content->step_howto_description = $row['step_howto_description'];
+                $content->step_url = $row['step_url'];
+                $content->header_id = $row['header_id'];
+                $content->subheader_id = $row['subheader_id'];
+                $content->header_description = $row['header_description'];
+                $content->subheader_description = $row['subheader_description'];
+                array_push($this->content, $content);
+
             }
         }
     }

@@ -76,7 +76,7 @@ class content
                 $this->link_chapter();
                 break;
             case "commodity":
-
+                $this->link_commodity();
                 break;
             case "measure_type":
                 $this->link_measure_type();
@@ -199,8 +199,24 @@ class content
         ));
     }
 
-
     public function link_measure_type()
+    {
+        //application::debug();
+        global $conn;
+        $id = get_querystring("id");
+        $chapter = intval(get_querystring("chapter"));
+        $sql = "INSERT INTO signposting_step_chapter_assignment
+        (signposting_step_id, chapter_id)
+        VALUES ($1, $2)
+        on conflict ON CONSTRAINT signposting_step_chapter_assignment_un DO NOTHING";
+        $command = uniqid();
+        pg_prepare($conn, $command, $sql);
+        pg_execute($conn, $command, array(
+            $id, $chapter
+        ));
+    }
+
+    public function link_commodity()
     {
         application::debug();
         global $conn;

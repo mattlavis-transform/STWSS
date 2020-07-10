@@ -368,7 +368,7 @@ class application
     public function get_content()
     {
         global $conn;
-        $sql = "select ss.id, step_description, step_howto_description, step_url, header_id, subheader_id, 
+        $sql = "select ss.id, step_description, step_howto_description, step_url, ss.header_id, ss.subheader_id, 
         ssh.header_description, sss.subheader_description 
         from signposting_steps ss, signposting_step_headers ssh, signposting_step_subheaders sss 
         where ss.header_id = ssh.id
