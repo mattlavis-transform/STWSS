@@ -225,8 +225,15 @@ class content
         global $conn;
         $id = get_querystring("id");
         $commodity = new commodity();
-        $commodity->goods_nomenclature_item_id = get_querystring("commodity_code");
-        $commodity->goods_nomenclature_sid = get_querystring("commodity");
+        $action = get_querystring("action");
+        if ($action == "create_content") {
+            $commodity->goods_nomenclature_item_id = get_querystring("identifier");
+            $commodity->goods_nomenclature_sid = get_querystring("sid");
+        } else {
+            $commodity->goods_nomenclature_item_id = get_querystring("commodity_code");
+            $commodity->goods_nomenclature_sid = get_querystring("commodity");
+        }
+
         if ($commodity->validate()) {
             // Insert the commodity code
             $sql = "INSERT INTO goods_nomenclatures
@@ -630,6 +637,7 @@ class content
                 break;
 
             case "commodity":
+                $this->link_commodity();
                 $sql = "INSERT INTO signposting_step_commodity_assignment
                 (signposting_step_id, goods_nomenclature_sid) VALUES ($1, $2)";
                 $command = uniqid();
@@ -660,7 +668,7 @@ class content
                     $sid
                 ));
                 break;
-                
+
             case "trade_type":
                 $sql = "INSERT INTO signposting_step_trade_type_assignment
                 (signposting_step_id, trade_type) VALUES ($1, $2)";

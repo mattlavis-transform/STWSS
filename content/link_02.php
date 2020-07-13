@@ -81,7 +81,7 @@ require("../includes/meta.php");
                                 new select("chapter", $app->chapters, "Select a chapter", "Select from one of the available chapters", false, "");
                                 break;
                             case "commodity":
-                                new input("commodity_code", "Enter a commodity code", "Enter the full 10-digit commodity code", false, "", "govuk-input--width-10", 10);
+                                new input("commodity_code", "Enter a commodity code", "Enter at least 4 digits from the commodity code", false, "", "govuk-input--width-10", 10);
                                 break;
                             case "measure_type":
                                 new input("measure_type", "Enter the ID of the measure type", "Enter the 3-digit measure type ID", false, "", "govuk-input--width-3", 3);
