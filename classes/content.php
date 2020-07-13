@@ -93,7 +93,7 @@ class content
         $c->panel_title = "Content item " . $id . " has been successfully linked";
         $c->panel_body = "";
         $c->step1 = "<a class='govuk-link' href='/content/link_01.html?id=" . $id . "'>Link this content again</a>";
-        $c->step2 = "<a class='govuk-link' href='/content/edit.html?id=" . $id . "'>View this content item</a>";
+        $c->step2 = "<a class='govuk-link' href='/content/edit.html?id=" . $id . "#linkage'>View this content item</a>";
         $c->step3 = "<a class='govuk-link' href='/content'>View all content</a>";
         $c->encrypt_data();
         $url = "/includes/confirm.html?data=" . $c->data_encrypted;
@@ -117,15 +117,19 @@ class content
                 $url = "/chapters/view.html?id=" . $id . "#content";
                 break;
             case "commodity":
+                $this->unlink_commodity($sid);
                 $url = "/";
                 break;
             case "measure_type":
+                $this->unlink_measure_type($sid);
                 $url = "/";
                 break;
             case "document_code":
+                $this->unlink_document_code($sid);
                 $url = "/";
                 break;
             case "trade_type":
+                $this->unlink_trade_type($sid);
                 $url = "/";
                 break;
         }
@@ -184,11 +188,10 @@ class content
 
     public function link_document_code()
     {
-        //application::debug();
         global $conn;
         $id = get_querystring("id");
-        $document_code = intval(get_querystring("document_code"));
-        $sql = "INSERT INTO signposting_step_chapter_assignment
+        $document_code = get_querystring("document_code");
+        $sql = "INSERT INTO signposting_step_document_code_assignment
         (signposting_step_id, document_code)
         VALUES ($1, $2)
         on conflict ON CONSTRAINT signposting_step_document_code_assignment_un DO NOTHING";
@@ -197,40 +200,63 @@ class content
         pg_execute($conn, $command, array(
             $id, $document_code
         ));
+        //application::debug();
     }
 
     public function link_measure_type()
     {
-        //application::debug();
         global $conn;
         $id = get_querystring("id");
-        $chapter = intval(get_querystring("chapter"));
-        $sql = "INSERT INTO signposting_step_chapter_assignment
-        (signposting_step_id, chapter_id)
+        $measure_type = get_querystring("measure_type");
+        $sql = "INSERT INTO signposting_step_measure_type_assignment
+        (signposting_step_id, measure_type_id)
         VALUES ($1, $2)
-        on conflict ON CONSTRAINT signposting_step_chapter_assignment_un DO NOTHING";
+        on conflict ON CONSTRAINT signposting_step_measure_type_assignment_un DO NOTHING";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         pg_execute($conn, $command, array(
-            $id, $chapter
+            $id, $measure_type
         ));
+        //application::debug();
     }
 
     public function link_commodity()
     {
-        application::debug();
         global $conn;
         $id = get_querystring("id");
-        $chapter = intval(get_querystring("chapter"));
-        $sql = "INSERT INTO signposting_step_chapter_assignment
-        (signposting_step_id, chapter_id)
-        VALUES ($1, $2)
-        on conflict ON CONSTRAINT signposting_step_chapter_assignment_un DO NOTHING";
-        $command = uniqid();
-        pg_prepare($conn, $command, $sql);
-        pg_execute($conn, $command, array(
-            $id, $chapter
-        ));
+        $commodity = new commodity();
+        $commodity->goods_nomenclature_item_id = get_querystring("commodity_code");
+        if ($commodity->validate()) {
+            // Insert the commodity code
+            $sql = "INSERT INTO goods_nomenclatures
+            (goods_nomenclature_sid, goods_nomenclature_item_id, description, number_indents, productline_suffix)
+            VALUES ($1, $2, $3, $4, $5)
+            on conflict ON CONSTRAINT goods_nomenclatures_pk DO NOTHING;";
+            $command = uniqid();
+            pg_prepare($conn, $command, $sql);
+            pg_execute($conn, $command, array(
+                $commodity->goods_nomenclature_sid,
+                $commodity->goods_nomenclature_item_id,
+                $commodity->description,
+                $commodity->number_indents,
+                $commodity->productline_suffix
+            ));
+
+            // Insert the step assignment
+            $sql = "INSERT INTO signposting_step_commodity_assignment
+            (signposting_step_id, goods_nomenclature_sid)
+            VALUES ($1, $2)
+            on conflict ON CONSTRAINT signposting_step_commodity_assignment_un DO NOTHING";
+            $command = uniqid();
+            pg_prepare($conn, $command, $sql);
+            pg_execute($conn, $command, array(
+                $id, $commodity->goods_nomenclature_sid
+            ));
+
+            h1("found");
+        } else {
+            h1("not found");
+        };
     }
 
     public function link_trade_type()
@@ -272,6 +298,50 @@ class content
         ));
     }
 
+    public function unlink_commodity($sid)
+    {
+        global $conn;
+        $sql = "DELETE FROM signposting_step_commodity_assignment where id = $1";
+        $command = uniqid();
+        pg_prepare($conn, $command, $sql);
+        pg_execute($conn, $command, array(
+            $sid
+        ));
+    }
+
+    public function unlink_measure_type($sid)
+    {
+        global $conn;
+        $sql = "DELETE FROM signposting_step_measure_type_assignment where id = $1";
+        $command = uniqid();
+        pg_prepare($conn, $command, $sql);
+        pg_execute($conn, $command, array(
+            $sid
+        ));
+    }
+
+    public function unlink_document_code($sid)
+    {
+        global $conn;
+        $sql = "DELETE FROM signposting_step_document_code_assignment where id = $1";
+        $command = uniqid();
+        pg_prepare($conn, $command, $sql);
+        pg_execute($conn, $command, array(
+            $sid
+        ));
+    }
+
+    public function unlink_trade_type($sid)
+    {
+        global $conn;
+        $sql = "DELETE FROM signposting_step_trade_type_assignment where id = $1";
+        $command = uniqid();
+        pg_prepare($conn, $command, $sql);
+        pg_execute($conn, $command, array(
+            $sid
+        ));
+    }
+
     public function get_linkages($link_type)
     {
         global $conn;
@@ -296,11 +366,11 @@ class content
                 break;
             case "commodity":
                 $title = "Links to commodity codes";
-                $sql = "select ssca.id, c.id as identifier, c.description, '/commodities/view.html?id=' || c.id as view_url
-                from signposting_step_chapter_assignment ssca, chapters c
-                where cast(c.id as int) = ssca.chapter_id 
+                $sql = "select ssca.id, gn.goods_nomenclature_item_id as identifier, gn.description, '/commodities/view.html?id=' || gn.goods_nomenclature_sid as view_url
+                from signposting_step_commodity_assignment ssca, goods_nomenclatures gn 
+                where gn.goods_nomenclature_sid = ssca.goods_nomenclature_sid 
                 and signposting_step_id = $1
-                order by c.id ;"; // This is dummy code
+                order by gn.goods_nomenclature_item_id;";
                 $link_url = "/content/link_02.html?link_type=commodity&id=" . $this->id;
                 break;
             case "measure_type":
@@ -438,7 +508,6 @@ class content
         $c->encrypt_data();
         $url = "/includes/confirm.html?data=" . $c->data_encrypted;
         header("Location: " . $url);
-
     }
 
     function validate()

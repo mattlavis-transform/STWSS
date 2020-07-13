@@ -15,11 +15,87 @@ class commodity
     public $export_measures = array();
     public $content = array();
 
+    public function validate()
+    {
+        /* Purpose - check whether the commodity exists
+        Step 1 - Check on the commodity page itself; if page exists then the commodity exists
+        Step 2 - Check on the headings page: look at the 1st 4 digits, then bring back all the child codes
+                 If one of the child codes matches, then we are cool
+        */
+        $this->goods_nomenclature_item_id = trim($this->goods_nomenclature_item_id);
+        $this->goods_nomenclature_item_id = str_pad($this->goods_nomenclature_item_id, 10, "0");
+
+        $retval = null;
+        $root = "https://www.trade-tariff.service.gov.uk/api/v2/commodities/";
+        $url = $root . $this->goods_nomenclature_item_id;
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($curl);
+        $json = json_decode($output, true);
+
+        if (isset($json["data"])) {
+            $data = $json["data"];
+            $this->goods_nomenclature_sid = $json["data"]["id"];
+            $this->description = $json["data"]["attributes"]["formatted_description"];
+            $this->number_indents = $json["data"]["attributes"]["number_indents"];
+            $this->productline_suffix = "80";
+            $retval = true; // Returns true if the commodity code exists as a leaf / end-line only
+            //h1("I am an end line and exist in the database");
+        } else {
+            $root = "https://www.trade-tariff.service.gov.uk/api/v2/headings/";
+            $url = $root . substr($this->goods_nomenclature_item_id, 0, 4);
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_URL, $url);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+            $output = curl_exec($curl);
+            $json = json_decode($output, true);
+            $found = false;
+            if (isset($json["included"])) {
+                $included = $json["included"];
+                foreach ($included as $item) {
+                    if ($item["type"] == "commodity") {
+                        if ($item["attributes"]["goods_nomenclature_item_id"] == $this->goods_nomenclature_item_id) {
+                            if ($item["attributes"]["producline_suffix"] == "80") {
+                                $this->goods_nomenclature_sid = $item["id"];
+                                $this->number_indents = $item["attributes"]["number_indents"];
+                                $this->productline_suffix = "80";
+                                $this->description = $item["attributes"]["formatted_description"];
+                                $found = true;
+                                //h1("here");
+                                break;
+                            }
+                        }
+                    }
+                }
+                $retval = $found;
+                if ($found == true) {
+                    //h1("I am an intermediate code and I exist in the database");
+                    $retval = true;
+                } else {
+                    if (isset($json["data"])) {
+                        //pre ($json["data"]);
+                        //h1("I am a heading");
+                        $this->goods_nomenclature_sid = $json["data"]["id"];
+                        $this->description = $json["data"]["attributes"]["formatted_description"];
+                        $this->number_indents = 0;
+                        $this->productline_suffix = "80";
+                        $retval = true;
+                    }
+                }
+            } else {
+                $retval = false;
+                //h1("I do not exist");
+            }
+        }
+        return ($retval);
+    }
+
     public function get_details()
     {
+        global $conn;
         $root = "https://www.trade-tariff.service.gov.uk/api/v2/headings/";
         $url = $root . substr($this->goods_nomenclature_item_id, 0, 4);
-    global $conn;
         $sql = "select goods_nomenclature_sid, goods_nomenclature_item_id, productline_suffix,
         description, number_indents, declarable 
         from goods_nomenclatures gn where goods_nomenclature_item_id = $1
@@ -62,7 +138,7 @@ class commodity
         // get the detais
         $this->description = $json["data"]["attributes"]["formatted_description"];
         $this->number_indents = $json["data"]["attributes"]["number_indents"];
-        
+
         // Get the relationships
         $relationships = $json["data"]["relationships"];
         $section_id = $relationships["section"]["data"]["id"];
@@ -222,7 +298,6 @@ class commodity
                 $content->header_description = $row['header_description'];
                 $content->subheader_description = $row['subheader_description'];
                 array_push($this->content, $content);
-
             }
         }
     }
