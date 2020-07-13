@@ -35,7 +35,7 @@ class content
             $app->crumb_string = "Home|/;Content|/content;Content item " . $this->id . "|";
 
             $sql = "select id, step_description, step_howto_description, step_url, header_id, subheader_id 
-        from signposting_steps ss where id = $1;";
+            from signposting_steps ss where id = $1;";
             pg_prepare($conn, "get_content", $sql);
             $result = pg_execute($conn, "get_content", array($this->id));
             $row_count = pg_num_rows($result);
@@ -226,6 +226,7 @@ class content
         $id = get_querystring("id");
         $commodity = new commodity();
         $commodity->goods_nomenclature_item_id = get_querystring("commodity_code");
+        $commodity->goods_nomenclature_sid = get_querystring("commodity");
         if ($commodity->validate()) {
             // Insert the commodity code
             $sql = "INSERT INTO goods_nomenclatures
@@ -257,6 +258,7 @@ class content
         } else {
             h1("not found");
         };
+        //application::debug();
     }
 
     public function link_trade_type()
@@ -366,7 +368,7 @@ class content
                 break;
             case "commodity":
                 $title = "Links to commodity codes";
-                $sql = "select ssca.id, gn.goods_nomenclature_item_id as identifier, gn.description, '/commodities/view.html?id=' || gn.goods_nomenclature_sid as view_url
+                $sql = "select ssca.id, gn.goods_nomenclature_item_id as identifier, gn.description, '/commodities/view.html?goods_nomenclature_item_id=' || gn.goods_nomenclature_item_id as view_url
                 from signposting_step_commodity_assignment ssca, goods_nomenclatures gn 
                 where gn.goods_nomenclature_sid = ssca.goods_nomenclature_sid 
                 and signposting_step_id = $1
@@ -628,8 +630,16 @@ class content
                 break;
 
             case "commodity":
-                $url = "/";
+                $sql = "INSERT INTO signposting_step_commodity_assignment
+                (signposting_step_id, goods_nomenclature_sid) VALUES ($1, $2)";
+                $command = uniqid();
+                pg_prepare($conn, $command, $sql);
+                $result = pg_execute($conn, $command, array(
+                    $id,
+                    $sid
+                ));
                 break;
+
             case "measure_type":
                 $sql = "INSERT INTO signposting_step_measure_type_assignment
                 (signposting_step_id, measure_type_id) VALUES ($1, $2)";
@@ -650,6 +660,7 @@ class content
                     $sid
                 ));
                 break;
+                
             case "trade_type":
                 $sql = "INSERT INTO signposting_step_trade_type_assignment
                 (signposting_step_id, trade_type) VALUES ($1, $2)";
@@ -682,7 +693,7 @@ class content
 
         $this->id = get_request("id");
         $yes_no = get_request("yes_no");
-        if ($yes_no == "no") {
+        if ($yes_no != "yes") {
             $url = "/content";
             header("Location: " . $url);
             return;

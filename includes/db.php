@@ -1,4 +1,5 @@
 <?php
+
 // Classes
 require(dirname(__FILE__) . "../../classes/application.php");
 require(dirname(__FILE__) . "../../classes/certificate.php");
@@ -1081,7 +1082,16 @@ function format_json_key_value_pairs($obj)
     return ($out);
 }
 
-function cmp($a, $b) {
-    return strcmp($a->type_index, $b->type_index);
-}
+function cmp($a, $b)
+{
+    // for comparing the commodity / hierarchy objects
+    $tmp = strcmp($a->type_index, $b->type_index);
+    if ($tmp == 0) {
+        $tmp = strcmp($a->goods_nomenclature_item_id, $b->goods_nomenclature_item_id);
+        if ($tmp == 0) {
+            $tmp = strcmp($a->productline_suffix, $b->productline_suffix);
+        }
+    }
 
+    return ($tmp);
+}

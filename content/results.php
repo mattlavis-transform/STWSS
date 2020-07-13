@@ -42,7 +42,6 @@ require("../includes/meta.php");
                         echo ("</thead>");
                         echo ("<tbody class='govuk-table__body'>");
                         foreach ($app->found_content as $c) {
-                            $use_url = "/includes/routes.php?action=create_content_linkage&id=$c->id&link_type=$app->link_type&section=$app->sid";
                             $app->get_linkage_url($c->id);
                             echo ("<tr class='govuk-table__row'>\n");
                             echo ("<td class='govuk-table__cell'>");

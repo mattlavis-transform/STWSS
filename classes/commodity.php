@@ -14,45 +14,51 @@ class commodity
     public $import_measures = array();
     public $export_measures = array();
     public $content = array();
+    public $is_heading = null;
+    public $commodity_type = null;
+    public $curl = null;
+    public $json = null;
 
     public function validate()
     {
-        /* Purpose - check whether the commodity exists
-        Step 1 - Check on the commodity page itself; if page exists then the commodity exists
-        Step 2 - Check on the headings page: look at the 1st 4 digits, then bring back all the child codes
-                 If one of the child codes matches, then we are cool
+        /*
+        Purpose - Check whether the commodity exists
+        Step 1  - Check on the commodity page itself; if page exists then the commodity exists
+        Step 2  - Check on the headings page: look at the 1st 4 digits, then bring back all the child codes
+                  If one of the child codes matches, then we are cool
         */
-        $this->goods_nomenclature_item_id = trim($this->goods_nomenclature_item_id);
-        $this->goods_nomenclature_item_id = str_pad($this->goods_nomenclature_item_id, 10, "0");
+        $this->pad_commodity_code();
 
         $retval = null;
         $root = "https://www.trade-tariff.service.gov.uk/api/v2/commodities/";
         $url = $root . $this->goods_nomenclature_item_id;
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $output = curl_exec($curl);
-        $json = json_decode($output, true);
+        $this->curl = curl_init();
+        curl_setopt($this->curl, CURLOPT_URL, $url);
+        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($this->curl);
+        $this->json = json_decode($output, true);
 
-        if (isset($json["data"])) {
-            $data = $json["data"];
-            $this->goods_nomenclature_sid = $json["data"]["id"];
-            $this->description = $json["data"]["attributes"]["formatted_description"];
-            $this->number_indents = $json["data"]["attributes"]["number_indents"];
+        if (isset($this->json["data"])) {
+            $data = $this->json["data"];
+            $this->goods_nomenclature_sid = $this->json["data"]["id"];
+            $this->description = $this->json["data"]["attributes"]["formatted_description"];
+            $this->number_indents = $this->json["data"]["attributes"]["number_indents"];
             $this->productline_suffix = "80";
+            $this->commodity_type = "endline";
             $retval = true; // Returns true if the commodity code exists as a leaf / end-line only
             //h1("I am an end line and exist in the database");
         } else {
             $root = "https://www.trade-tariff.service.gov.uk/api/v2/headings/";
             $url = $root . substr($this->goods_nomenclature_item_id, 0, 4);
-            $curl = curl_init();
-            curl_setopt($curl, CURLOPT_URL, $url);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-            $output = curl_exec($curl);
-            $json = json_decode($output, true);
+            $this->curl = curl_init();
+            curl_setopt($this->curl, CURLOPT_URL, $url);
+            curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
+            $output = curl_exec($this->curl);
+            $this->json = json_decode($output, true);
+
             $found = false;
-            if (isset($json["included"])) {
-                $included = $json["included"];
+            if (isset($this->json["included"])) {
+                $included = $this->json["included"];
                 foreach ($included as $item) {
                     if ($item["type"] == "commodity") {
                         if ($item["attributes"]["goods_nomenclature_item_id"] == $this->goods_nomenclature_item_id) {
@@ -61,8 +67,8 @@ class commodity
                                 $this->number_indents = $item["attributes"]["number_indents"];
                                 $this->productline_suffix = "80";
                                 $this->description = $item["attributes"]["formatted_description"];
+                                $this->commodity_type = "intermediate";
                                 $found = true;
-                                //h1("here");
                                 break;
                             }
                         }
@@ -73,82 +79,93 @@ class commodity
                     //h1("I am an intermediate code and I exist in the database");
                     $retval = true;
                 } else {
-                    if (isset($json["data"])) {
-                        //pre ($json["data"]);
+                    if (isset($this->json["data"])) {
                         //h1("I am a heading");
-                        $this->goods_nomenclature_sid = $json["data"]["id"];
-                        $this->description = $json["data"]["attributes"]["formatted_description"];
+                        $this->goods_nomenclature_sid = $this->json["data"]["id"];
+                        $this->description = $this->json["data"]["attributes"]["formatted_description"];
                         $this->number_indents = 0;
                         $this->productline_suffix = "80";
+                        $this->commodity_type = "heading";
                         $retval = true;
                     }
                 }
             } else {
                 $retval = false;
+                $this->commodity_type = null;
                 //h1("I do not exist");
             }
         }
+        $this->terminate_curl();
         return ($retval);
     }
 
-    public function get_details()
+    public function pad_commodity_code()
     {
-        global $conn;
-        $root = "https://www.trade-tariff.service.gov.uk/api/v2/headings/";
-        $url = $root . substr($this->goods_nomenclature_item_id, 0, 4);
-        $sql = "select goods_nomenclature_sid, goods_nomenclature_item_id, productline_suffix,
-        description, number_indents, declarable 
-        from goods_nomenclatures gn where goods_nomenclature_item_id = $1
-        and productline_suffix = $2";
-
-        if ($this->productline_suffix == "") {
-            $this->productline_suffix = "80";
-        }
-        pg_prepare($conn, "get_details", $sql);
-        $result = pg_execute($conn, "get_details", array($this->goods_nomenclature_item_id, $this->productline_suffix));
-        $row_count = pg_num_rows($result);
-        if (($result) && ($row_count > 0)) {
-            $row = pg_fetch_array($result);
-            $this->goods_nomenclature_sid = $row["goods_nomenclature_sid"];
-            $this->goods_nomenclature_item_id = $row["goods_nomenclature_item_id"];
-            $this->description = $row["description"];
-            $this->productline_suffix = $row["productline_suffix"];
-            $this->number_indents = $row["number_indents"];
-            $this->declarable = $row["declarable"];
-        }
+        $this->goods_nomenclature_item_id = str_replace(" ", "", $this->goods_nomenclature_item_id);
+        $this->goods_nomenclature_item_id = trim($this->goods_nomenclature_item_id);
+        $this->goods_nomenclature_item_id = str_pad($this->goods_nomenclature_item_id, 10, "0");
     }
 
-    public function get_hierarchy()
+    public function get_commodity_from_api()
     {
-        if (substr($this->goods_nomenclature_item_id, -6) == "000000") {
-            $root = "https://www.trade-tariff.service.gov.uk/api/v2/headings/";
-            $url = $root . substr($this->goods_nomenclature_item_id, 0, 4);
-            $is_heading = true;
-        } else {
-            $root = "https://www.trade-tariff.service.gov.uk/api/v2/commodities/";
-            $url = $root . $this->goods_nomenclature_item_id;
-            $is_heading = false;
-        }
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $output = curl_exec($curl);
-        $json = json_decode($output, true);
-
-        // get the detais
-        $this->description = $json["data"]["attributes"]["formatted_description"];
-        $this->number_indents = $json["data"]["attributes"]["number_indents"];
+        $ret = $this->validate();
 
         // Get the relationships
-        $relationships = $json["data"]["relationships"];
+        $relationships = $this->json["data"]["relationships"];
         $section_id = $relationships["section"]["data"]["id"];
         $chapter_id = $relationships["chapter"]["data"]["id"];
-        if ($is_heading == false) {
-            $heading_id = $relationships["heading"]["data"]["id"];
-            $ancestors = $relationships["ancestors"];
+        if ($this->is_heading == false) {
+            if (isset($relationships["heading"])) {
+                $heading_id = $relationships["heading"]["data"]["id"];
+            }
+            if (isset($relationships["ancestors"])) {
+                $ancestors = $relationships["ancestors"];
+            }
         }
+
+        //h1($this->commodity_type);
+        if ($this->commodity_type != "endline") {
+            $data = $this->json["data"];
+
+            $h = new hierarchy();
+            $h->goods_nomenclature_item_id = $data["attributes"]["goods_nomenclature_item_id"];
+            $h->productline_suffix = "80";
+            $h->description = $data["attributes"]["formatted_description"];
+            $h->type = "heading";
+            $h->type_index = 3;
+            $h->url = "/commodities/view.html?goods_nomenclature_item_id=" . substr($h->goods_nomenclature_item_id, 0, 4);
+            array_push($this->hierarchies, $h);
+
+            if ($this->commodity_type == "intermediate") {
+                $included = $this->json["included"];
+                $found = true;
+                $sid = $this->goods_nomenclature_sid;
+                do {
+                    $found = false;
+                    foreach ($included as $item) {
+                        if ($item["id"] == $sid) {
+                            $sid = $item["attributes"]["parent_sid"];
+                            $found = true;
+                            if ($sid != $this->goods_nomenclature_sid) {
+
+                                $h = new hierarchy();
+                                $h->goods_nomenclature_item_id = $item["attributes"]["goods_nomenclature_item_id"];
+                                $h->productline_suffix = $item["attributes"]["producline_suffix"];
+                                $h->description = $item["attributes"]["formatted_description"];
+                                $h->type = "commodity";
+                                $h->type_index = 3;
+                                $h->url = "/commodities/view.html?goods_nomenclature_item_id=" . $h->goods_nomenclature_item_id . "&productline_suffix=" . $h->productline_suffix;
+                                array_push($this->hierarchies, $h);
+                            }
+                            break;
+                        }
+                    }
+                } while ($found == true);
+            }
+        }
+
         // Get the actual data from the included section
-        $included = $json["included"];
+        $included = $this->json["included"];
         foreach ($included as $item) {
             $type = $item["type"];
             switch ($type) {
@@ -158,60 +175,73 @@ class commodity
                     $h->description = $item["attributes"]["title"];
                     $h->type = "section";
                     $h->type_index = 0;
+                    $h->url = "/sections/view.html?id=" . $item["id"];
                     array_push($this->hierarchies, $h);
                     break;
+
                 case "chapter":
                     $h = new hierarchy();
                     $h->goods_nomenclature_item_id = $item["attributes"]["goods_nomenclature_item_id"];
                     $h->description = $item["attributes"]["formatted_description"];
                     $h->type = "chapter";
                     $h->type_index = 1;
+                    $h->url = "/chapters/view.html?id=" . substr($h->goods_nomenclature_item_id, 0, 2);
                     array_push($this->hierarchies, $h);
                     break;
-                case "commodity":
+
+                case "heading":
                     $h = new hierarchy();
                     $h->goods_nomenclature_item_id = $item["attributes"]["goods_nomenclature_item_id"];
-                    $h->productline_suffix = $item["attributes"]["producline_suffix"];
                     $h->description = $item["attributes"]["formatted_description"];
-                    $h->type = "commodity";
+                    $h->type = "heading";
                     $h->type_index = 2;
+                    $h->url = "/commodities/view.html?goods_nomenclature_item_id=" . substr($h->goods_nomenclature_item_id, 0, 4);
                     array_push($this->hierarchies, $h);
                     break;
+
+                case "commodity":
+                    if ($this->commodity_type == "endline") {
+                        $h = new hierarchy();
+                        $h->goods_nomenclature_item_id = $item["attributes"]["goods_nomenclature_item_id"];
+                        $h->productline_suffix = $item["attributes"]["producline_suffix"];
+                        $h->description = $item["attributes"]["formatted_description"];
+                        $h->type = "commodity";
+                        $h->type_index = 3;
+                        $h->url = "/commodities/view.html?goods_nomenclature_item_id=" . $h->goods_nomenclature_item_id . "&productline_suffix=" . $h->productline_suffix;
+                        array_push($this->hierarchies, $h);
+                    }
+                    break;
             }
         }
-
-        // termintte
-        curl_close($curl);
 
         usort($this->hierarchies, "cmp");
-        $indent = "&nbsp;&nbsp;&nbsp;";
-        $mark = "-&nbsp;";
-        $indent_count = 0;
-        //pre($this->hierarchies);
+        $index = 1;
         foreach ($this->hierarchies as $h) {
-            /*
-            $this->hierarchy_string .= str_repeat($indent, $indent_count);
-            if ($indent_count > 0) {
-                $this->hierarchy_string .= $mark;
-            }
-            */
+            $this->hierarchy_string .= "<div class='w100'><div class='c1'>" . $index . ".</div>";
             switch ($h->type) {
                 case "section":
-                    $this->hierarchy_string .= "<div class='c1'>Section " . $h->goods_nomenclature_item_id . "</div><div class='c2'>" . $h->description . "</div>";
+                    $this->hierarchy_string .= "<div class='c2'><a href='" . $h->url . "'>Section " . $h->goods_nomenclature_item_id . "</a></div><div class='c3'>" . $h->description . "</div>";
                     break;
                 case "chapter":
-                    $this->hierarchy_string .= "<div class='c1'>Chapter " . substr($h->goods_nomenclature_item_id, 0, 2) . "</div><div class='c2'>" . $h->description . "</div>";
+                    $this->hierarchy_string .= "<div class='c2'><a href='" . $h->url . "'>Chapter " . substr($h->goods_nomenclature_item_id, 0, 2) . "</a></div><div class='c3'>" . $h->description . "</div>";
+                    break;
+                case "heading":
+                    $this->hierarchy_string .= "<div class='c2'><a href='" . $h->url . "'>Heading " . substr($h->goods_nomenclature_item_id, 0, 4) . "</a></div><div class='c3'>" . $h->description . "</div>";
                     break;
                 case "commodity":
-                    $this->hierarchy_string .= "<div class='c1'>" . $h->formatted_commodity() . "</div><div class='c2'>" . $h->description . "</div>";
+                    $this->hierarchy_string .= "<div class='c2'><a href='" . $h->url . "'>" . $h->formatted_commodity() . "</a></div><div class='c3'>" . $h->description . "</div>";
                     break;
             }
-
-            //$this->hierarchy_string .= $h->goods_nomenclature_item_id . "&nbsp;" . $h->description . "<br />";
-            $indent_count += 1;
+            $this->hierarchy_string .= "</div><div class='clearer'><!-- &nbsp; //--></div>";
+            $index += 1;
         }
+        return (true);
     }
 
+    private function terminate_curl()
+    {
+        curl_close($this->curl);
+    }
 
     public function get_import_measures()
     {
@@ -279,11 +309,11 @@ class commodity
         where ss.id = ssca.signposting_step_id 
         and ss.header_id = ssh.id 
         and ss.subheader_id = sss.id 
-        and code = $1
+        and goods_nomenclature_sid = $1
         order by ss.id;
         ";
         pg_prepare($conn, "get_signposting_steps", $sql);
-        $result = pg_execute($conn, "get_signposting_steps", array($this->goods_nomenclature_item_id));
+        $result = pg_execute($conn, "get_signposting_steps", array($this->goods_nomenclature_sid));
         $row_count = pg_num_rows($result);
         if (($result) && ($row_count > 0)) {
             while ($row = pg_fetch_array($result)) {

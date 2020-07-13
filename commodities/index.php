@@ -29,7 +29,7 @@ require("../includes/meta.php");
                     <form novalidate action="/includes/routes.php" method="post" class="get">
                         <div class="govuk-form-group">
                             <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--m" for="goods_nomenclature_item_id">
-                                    Enter the commodity code
+                                    Search for a commodity code
                                 </label>
                             </h1>
                             <span id="contents-hint" class="govuk-hint">

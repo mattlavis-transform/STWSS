@@ -35,7 +35,6 @@ require("../includes/meta.php");
                         new button("submit", "Continue");
                         new hidden("action", "delete_content_check");
                         new hidden("id", $content->id);
-                        http://stw_data/includes/routes.php?action=delete_content&id=1
                         ?>
 
                     </div>

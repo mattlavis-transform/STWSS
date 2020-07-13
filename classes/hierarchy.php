@@ -7,6 +7,7 @@ class hierarchy
     public $description                 = "";
     public $type                        = "";
     public $type_index                  = "";
+    public $url                         = "";
 
     public function formatted_commodity() {
         $s = "";

@@ -60,6 +60,6 @@ class chapter
                 array_push($this->content, $content);
             }
         }
-        return ($content);
+        //return ($content);
     }
 }

@@ -585,7 +585,7 @@ class application
 
     function get_linkage_url($content_id)
     {
-        $this->linkage_url = "/includes/routes.php?action=create_content_linkage&id=" . $content_id . "&link_type=" . $this->link_type; //&section=$app->sid";
+        $this->linkage_url = "/includes/routes.php?action=create_content_linkage&id=" . $content_id . "&link_type=" . $this->link_type;
 
         switch ($this->link_type) {
             case "section":
@@ -595,7 +595,8 @@ class application
                 $this->linkage_url .= "&chapter=" . $this->sid;
                 break;
             case "commodity":
-                $this->linkage_url .= "&commodity=" . $this->sid;
+                $this->linkage_url .= "&commodity=" . $this->sid . "&commodity_code=" . $this->id;
+                pre($this);
                 break;
             case "measure_type":
                 $this->linkage_url .= "&measure_type=" . $this->sid;
