@@ -17,6 +17,17 @@
             <a href="/" class="govuk-header__link govuk-header__link--service-name">
                 <?= $app->application_name ?>
             </a>
+            <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide Top Level Navigation">Menu</button>
+      <nav>
+        <ul id="navigation" class="govuk-header__navigation " aria-label="Top Level Navigation">
+          <li class="govuk-header__navigation-item govuk-header__navigation-item--active">
+            <a class="govuk-header__link" href="/includes/routes.php?action=logout">
+              Log out
+            </a>
+          </li>
+
+        </ul>
+      </nav>
         </div>
     </div>
 </header>

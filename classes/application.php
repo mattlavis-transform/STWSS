@@ -31,6 +31,11 @@ class application
     public $error_array = array();
     public $found_content = array();
     public $err = 0;
+    public $logged_in = false;
+    public $user_id = null;
+    public $user_name = null;
+    public $first_name = null;
+    public $last_name = null;
 
     function __construct()
     {
@@ -42,6 +47,26 @@ class application
         $this->error_messages = array_map('str_getcsv', file($_SERVER['DOCUMENT_ROOT'] . '/csv/errors.csv'));
         if (session_id() == "") {
             session_start();
+        }
+        $this->check_permissions();
+    }
+
+    public function check_permissions()
+    {
+        $page = $_SERVER["SCRIPT_NAME"];
+        if (isset($_SESSION["user_id"])) {
+            $this->user_id = $_SESSION["user_id"];
+            $this->first_name = $_SESSION["first_name"];
+        } else {
+            if (($page != "/login.php") && ($page != "/includes/routes.php")) {
+                $user_id = get_session_variable("user_id");
+                h1("User ID = " . $user_id);
+                if ($user_id == "") {
+                    $this->logged_in = false;
+                    $url = "/login.html";
+                    header("Location: " . $url);
+                }
+            }
         }
     }
 
@@ -505,7 +530,6 @@ class application
         $this->sid = get_request("sid");
         $this->identifier = get_request("identifier");
 
-        //application::debug();
         if ($this->link_type != "") {
             new inset("This content will be linked to " . str_replace("_", " ", $this->link_type) . " " . $this->identifier);
         }
@@ -608,5 +632,58 @@ class application
                 $this->linkage_url .= "&trade_type=" . $this->sid;
                 break;
         }
+    }
+
+    function logout()
+    {
+        session_unset();
+        $url = "/";
+        header("Location: " . $url);
+    }
+
+    function login()
+    {
+        global $conn;
+        $user_name = get_querystring("user_name");
+        h1($user_name);
+        $password = get_querystring("password");
+        $password_encrypted = SA_Encryption::encrypt_to_url_param($password);
+        $sql = "select * from users where user_name = $1 and password = $2 limit 1";
+        $stmt = uniqid();
+        pg_prepare($conn, $stmt, $sql);
+        $result = pg_execute($conn, $stmt, array(
+            $user_name,
+            $password_encrypted
+        ));
+
+        $row_count = pg_num_rows($result);
+        if (($result) && ($row_count > 0)) {
+            $row = pg_fetch_array($result);
+            $user_id = $row["user_id"];
+            $user_name = $row["user_name"];
+            $first_name = $row["first_name"];
+            $last_name = $row["last_name"];
+            $this->set_user_id($user_id, $user_name, $first_name, $last_name);
+            $this->description = $row['description'];
+        } else {
+            $url = "/login.html";
+            header("Location: " . $url);
+        }
+    }
+
+    function set_user_id($user_id, $user_name, $first_name, $last_name)
+    {
+        $this->user_id = $user_id;
+        $this->user_name = $user_name;
+        $this->first_name = $first_name;
+        $this->last_name = $last_name;
+
+        $_SESSION["user_id"] = $user_id;
+        $_SESSION["user_name"] = $user_name;
+        $_SESSION["first_name"] = $first_name;
+        $_SESSION["last_name"] = $last_name;
+
+        $url = "/";
+        header("Location: " . $url);
     }
 }

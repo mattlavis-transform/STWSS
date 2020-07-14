@@ -64,7 +64,6 @@ class content
 
     public function link()
     {
-        //application::debug();
         $id = get_request("id");
         $link_type = get_request("link_type");
 
@@ -159,8 +158,8 @@ class content
         $id = get_querystring("id");
         $section_id = get_querystring("section");
         $sql = "INSERT INTO signposting_step_section_assignment
-        (signposting_step_id, section_id)
-        VALUES ($1, $2)
+        (signposting_step_id, section_id, date_created)
+        VALUES ($1, $2, current_timestamp)
         on conflict ON CONSTRAINT signposting_step_section_assignment_un DO NOTHING";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
@@ -176,8 +175,8 @@ class content
         $id = get_querystring("id");
         $chapter = intval(get_querystring("chapter"));
         $sql = "INSERT INTO signposting_step_chapter_assignment
-        (signposting_step_id, chapter_id)
-        VALUES ($1, $2)
+        (signposting_step_id, chapter_id, date_created)
+        VALUES ($1, $2, current_timestamp)
         on conflict ON CONSTRAINT signposting_step_chapter_assignment_un DO NOTHING";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
@@ -192,15 +191,14 @@ class content
         $id = get_querystring("id");
         $document_code = get_querystring("document_code");
         $sql = "INSERT INTO signposting_step_document_code_assignment
-        (signposting_step_id, document_code)
-        VALUES ($1, $2)
+        (signposting_step_id, document_code, date_created)
+        VALUES ($1, $2, current_timestamp)
         on conflict ON CONSTRAINT signposting_step_document_code_assignment_un DO NOTHING";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         pg_execute($conn, $command, array(
             $id, $document_code
         ));
-        //application::debug();
     }
 
     public function link_measure_type()
@@ -209,15 +207,14 @@ class content
         $id = get_querystring("id");
         $measure_type = get_querystring("measure_type");
         $sql = "INSERT INTO signposting_step_measure_type_assignment
-        (signposting_step_id, measure_type_id)
-        VALUES ($1, $2)
+        (signposting_step_id, measure_type_id, date_created)
+        VALUES ($1, $2, current_timestamp)
         on conflict ON CONSTRAINT signposting_step_measure_type_assignment_un DO NOTHING";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         pg_execute($conn, $command, array(
             $id, $measure_type
         ));
-        //application::debug();
     }
 
     public function link_commodity()
@@ -252,8 +249,8 @@ class content
 
             // Insert the step assignment
             $sql = "INSERT INTO signposting_step_commodity_assignment
-            (signposting_step_id, goods_nomenclature_sid)
-            VALUES ($1, $2)
+            (signposting_step_id, goods_nomenclature_sid, date_created)
+            VALUES ($1, $2, current_timestamp)
             on conflict ON CONSTRAINT signposting_step_commodity_assignment_un DO NOTHING";
             $command = uniqid();
             pg_prepare($conn, $command, $sql);
@@ -265,18 +262,16 @@ class content
         } else {
             h1("not found");
         };
-        //application::debug();
     }
 
     public function link_trade_type()
     {
-        application::debug();
         global $conn;
         $id = get_querystring("id");
         $chapter = intval(get_querystring("chapter"));
         $sql = "INSERT INTO signposting_step_chapter_assignment
-        (signposting_step_id, chapter_id)
-        VALUES ($1, $2)
+        (signposting_step_id, chapter_id, date_created)
+        VALUES ($1, $2, current_timestamp)
         on conflict ON CONSTRAINT signposting_step_chapter_assignment_un DO NOTHING";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
@@ -486,8 +481,15 @@ class content
 
         $link_type = get_request("link_type");
         $id = get_request("id");
-        //application::debug();
 
+        // Save the existing data to an audit table
+        $sql = "insert into signposting_steps_history
+        select * from signposting_steps ss where ss.id = $1;";
+        $command = uniqid();
+        pg_prepare($conn, $command, $sql);
+        $result = pg_execute($conn, $command, array(
+            $id
+        ));
 
         // Insert the step
         $sql = "UPDATE signposting_steps SET
@@ -495,7 +497,8 @@ class content
         step_howto_description = $2,
         step_url = $3,
         header_id = $4,
-        subheader_id = $5 
+        subheader_id = $5,
+        date_updated = current_timestamp
         WHERE id = $6";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
@@ -539,8 +542,7 @@ class content
         if ($this->subheader_id == "0") {
             array_push($this->errors, "subheader");
         }
-        //pre ($this->errors);
-        //application::debug();
+
         if (count($this->errors) > 0) {
             $this->data = "";
 
@@ -562,7 +564,6 @@ class content
 
     function create()
     {
-        //application::debug();
         global $conn, $app;
 
         $this->step_description = get_request("step_description");
@@ -581,8 +582,8 @@ class content
 
         // Insert the step
         $sql = "INSERT INTO signposting_steps
-        (step_description, step_howto_description, step_url, header_id, subheader_id)
-        VALUES ($1, $2, $3, $4, $5) RETURNING id;";
+        (step_description, step_howto_description, step_url, header_id, subheader_id, date_created, user_id)
+        VALUES ($1, $2, $3, $4, $5, current_timestamp, $6) RETURNING id;";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         $result = pg_execute($conn, $command, array(
@@ -590,7 +591,8 @@ class content
             $this->step_howto_description,
             $this->step_url,
             $this->header_id,
-            $this->subheader_id
+            $this->subheader_id,
+            $app->user_id
         ));
         // Get the ID back
         if (($result) && (pg_num_rows($result) > 0)) {
@@ -602,7 +604,8 @@ class content
         if (count($this->country_exclusion_list) > 0) {
             foreach ($this->country_exclusion_list as  $country_code) {
                 $sql = "INSERT INTO signposting_step_country_exclusions
-                (signposting_step_id, country_code) VALUES ($1, $2)";
+                (signposting_step_id, country_code, date_created)
+                VALUES ($1, $2, current_timestamp)";
                 $command = uniqid();
                 pg_prepare($conn, $command, $sql);
                 $result = pg_execute($conn, $command, array(
@@ -616,7 +619,8 @@ class content
         switch ($link_type) {
             case "section":
                 $sql = "INSERT INTO signposting_step_section_assignment
-                (signposting_step_id, section_id) VALUES ($1, $2)";
+                (signposting_step_id, section_id, date_created)
+                VALUES ($1, $2, current_timestamp)";
                 $command = uniqid();
                 pg_prepare($conn, $command, $sql);
                 $result = pg_execute($conn, $command, array(
@@ -627,7 +631,8 @@ class content
 
             case "chapter":
                 $sql = "INSERT INTO signposting_step_chapter_assignment
-                (signposting_step_id, chapter_id) VALUES ($1, $2)";
+                (signposting_step_id, chapter_id, date_created)
+                VALUES ($1, $2, current_timestamp)";
                 $command = uniqid();
                 pg_prepare($conn, $command, $sql);
                 $result = pg_execute($conn, $command, array(
@@ -639,7 +644,8 @@ class content
             case "commodity":
                 $this->link_commodity();
                 $sql = "INSERT INTO signposting_step_commodity_assignment
-                (signposting_step_id, goods_nomenclature_sid) VALUES ($1, $2)";
+                (signposting_step_id, goods_nomenclature_sid, date_created)
+                VALUES ($1, $2, current_timestamp)";
                 $command = uniqid();
                 pg_prepare($conn, $command, $sql);
                 $result = pg_execute($conn, $command, array(
@@ -650,7 +656,8 @@ class content
 
             case "measure_type":
                 $sql = "INSERT INTO signposting_step_measure_type_assignment
-                (signposting_step_id, measure_type_id) VALUES ($1, $2)";
+                (signposting_step_id, measure_type_id, date_created)
+                VALUES ($1, $2, current_timestamp)";
                 $command = uniqid();
                 pg_prepare($conn, $command, $sql);
                 $result = pg_execute($conn, $command, array(
@@ -660,7 +667,8 @@ class content
                 break;
             case "document_code":
                 $sql = "INSERT INTO signposting_step_document_code_assignment
-                (signposting_step_id, document_code) VALUES ($1, $2)";
+                (signposting_step_id, document_code, date_created)
+                VALUES ($1, $2, current_timestamp)";
                 $command = uniqid();
                 pg_prepare($conn, $command, $sql);
                 $result = pg_execute($conn, $command, array(
@@ -671,7 +679,8 @@ class content
 
             case "trade_type":
                 $sql = "INSERT INTO signposting_step_trade_type_assignment
-                (signposting_step_id, trade_type) VALUES ($1, $2)";
+                (signposting_step_id, trade_type, date_created)
+                VALUES ($1, $2, current_timestamp)";
                 $command = uniqid();
                 pg_prepare($conn, $command, $sql);
                 $result = pg_execute($conn, $command, array(

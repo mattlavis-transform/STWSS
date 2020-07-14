@@ -5,7 +5,6 @@ $app = new application();
 
 switch ($action) {
     case "commodity_search":
-        //application::debug();
         $goods_nomenclature_item_id = get_request("goods_nomenclature_item_id");
         $url = "/commodities/view.html?goods_nomenclature_item_id=" . $goods_nomenclature_item_id;
         header("Location: " . $url);
@@ -45,6 +44,14 @@ switch ($action) {
     case "delete_content_check":
         $content = new content();
         $content->delete();
+        break;
+
+    case "logout":
+        $app->logout();
+        break;
+
+    case "login":
+        $app->login();
         break;
 
     default:
