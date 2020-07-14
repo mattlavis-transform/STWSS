@@ -39,6 +39,11 @@ class application
 
     function __construct()
     {
+        /*
+        $pwd = "";
+        $test = SA_Encryption::encrypt_to_url_param($pwd);
+        h1 ($test);
+        */
         $this->application_name = "Smart Signposting Data Management";
         $this->url = $_SERVER['PHP_SELF'];
         array_push($this->yes_no, new data_item("yes", "Yes"));
