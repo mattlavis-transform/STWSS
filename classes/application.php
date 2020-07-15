@@ -641,8 +641,10 @@ class application
                 $c->step_description = $row['step_description'];
                 $c->step_howto_description = $row['step_howto_description'];
                 $c->step_url = $row['step_url'];
+                /*
                 $c->header_id = $row['header_id'];
                 $c->subheader_id = $row['subheader_id'];
+                */
                 array_push($this->found_content, $c);
             }
         }

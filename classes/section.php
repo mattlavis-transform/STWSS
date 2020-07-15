@@ -56,6 +56,12 @@ class section
         and ss.subheader_id = sss.id 
         and section_id = $1
         order by ss.id";
+        $sql = "select sssa.id as unique_id, ss.id, ss.step_description, ss.step_howto_description,
+        ss.step_url
+        from signposting_step_section_assignment sssa, signposting_steps ss
+        where ss.id = sssa.signposting_step_id 
+        and section_id = $1
+        order by ss.id";
         pg_prepare($conn, "get_signposting_steps", $sql);
         $result = pg_execute($conn, "get_signposting_steps", array($this->id));
         $row_count = pg_num_rows($result);
@@ -67,13 +73,14 @@ class section
                 $content->step_description = $row['step_description'];
                 $content->step_howto_description = $row['step_howto_description'];
                 $content->step_url = $row['step_url'];
+                /*
                 $content->header_id = $row['header_id'];
                 $content->subheader_id = $row['subheader_id'];
                 $content->header_description = $row['header_description'];
                 $content->subheader_description = $row['subheader_description'];
+                */
                 array_push($this->content, $content);
             }
         }
-        return ($content);
     }
 }
