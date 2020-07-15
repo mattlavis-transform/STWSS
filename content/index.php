@@ -92,7 +92,7 @@ require("../includes/meta.php");
                         </div>
                     </details>
 
-                    <table class="govuk-table govuk-table--m sticky">
+                    <table class="govuk-table govuk-table--s sticky">
                         <caption class="govuk-table__caption">Current content</caption>
                         <thead class="govuk-table__head">
                             <tr class="govuk-table__row">
@@ -114,7 +114,7 @@ require("../includes/meta.php");
                                         <?php if ($c->step_howto_description != "") {
                                             echo ($c->step_howto_description . "</br>");
                                         } ?>
-                                        <a target="_blank" rel="noopener noreferrer" href="<?= $c->step_url ?>"><?= $c->step_url ?></a><br /><br />
+                                        <a target="_blank" rel="noopener noreferrer" href="<?= $c->step_url ?>"><?= application::truncate($c->step_url, 100) ?></a><br /><br />
                                         <!--<em>Assigned to section / subsection:</em><br />
                                         &gt; <?= $c->header_description ?><br />
                                         &gt; <?= $c->subheader_description ?>//-->
@@ -137,7 +137,7 @@ require("../includes/meta.php");
                                         }
                                         ?>
                                     </td>
-                                    <td class="govuk-table__cell" style="min-width:30%;padding-right:1em">
+                                    <td class="govuk-table__cell" style="min-width:30%;padding-right:1.5em">
                                         <?php
                                         if (count($c->linkage) == 0) {
                                             echo ("Not restricted to any database entities");

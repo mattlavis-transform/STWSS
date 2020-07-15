@@ -56,6 +56,14 @@
     font-size: 16px !important;
 }
 
+.govuk-table--s td, .govuk-table--s th {
+    font-size: 14px !important;
+}
+
+.govuk-table--s td ol.govuk-list--m li, .govuk-table--s td ul.govuk-list--m li{
+    font-size: 14px !important;
+}
+
 .govuk-table.sticky th[scope=col] {
     position: sticky !important;
     top: 0 !important;

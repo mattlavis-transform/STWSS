@@ -640,6 +640,17 @@ class application
         }
     }
 
+    static public function truncate($text, $chars = 120) {
+        if(strlen($text) > $chars) {
+            $text = $text.' ';
+            $text = substr($text, 0, $chars);
+            //$text = substr($text, 0, strrpos($text ,' '));
+            $text = $text.'...';
+        }
+        //h1 ($text);
+        return ($text);
+    }
+
     static public function get_plural($s)
     {
         $s = str_replace("_", " ", $s);
