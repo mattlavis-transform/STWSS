@@ -102,25 +102,24 @@ img.icon2 {
 }
 
 div.c1 {
-    float:left;
+    float: left;
     width: 5%;
 }
 
 div.c2 {
-    float:left;
+    float: left;
     width: 25%;
 }
 
 div.c3 {
-    float:left;
+    float: left;
     width: 70%;
 }
 
-
 div.w100 {
     width: 100%;
-    padding-bottom:2em;
-    clear:both;
+    padding-bottom: 2em;
+    clear: both;
 }
 
 .w30 {
@@ -141,20 +140,42 @@ table.govuk-table--m p.govuk-body {
 
 ol.govuk-list--m, ul.govuk-list--m, ol.govuk-list--m li, ul.govuk-list--m li {
     font-size: 16px !important;
-    width:100%;
+    width: 100%;
 }
+
 i.far {
-    padding-left:1em;
+    padding-left: 1em;
 }
+
 .red {
-    color:#cc0000 !important;
+    color: #cc0000 !important;
 }
+
 .mono {
     font-family: "Courier New";
     font-size: 16px;
-    font-weight:bold;
-    padding-right:0.3em;
+    font-weight: bold;
+    padding-right: 0.3em;
 }
+
+.page {
+    min-width: 1.5em;
+    text-align: center;
+    margin-right: 4px;
+    font-weight: bold;
+    float: left;
+    display: block;
+    font-size: 14px !important
+}
+
+.page a {
+    border: 1px black solid;
+    font-weight: normal;
+    text-decoration: none;
+    display: block;
+    padding: 0px 4px;
+}
+
 /*
 table tbody tr:last-child td, table tbody tr:last-child th { border:0px }
 */

@@ -2,6 +2,7 @@
 require("../includes/db.php");
 $app = new application();
 //$app->get_certificate_content_assignment();
+$app->get_page();
 $app->get_content();
 $app->get_content_linkage();
 ?>
@@ -144,6 +145,7 @@ require("../includes/meta.php");
                             ?>
                         </tbody>
                     </table>
+                    <?php $app->show_paging_controls() ?>
                 </div>
             </div>
         </main>

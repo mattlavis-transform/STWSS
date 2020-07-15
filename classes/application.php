@@ -44,15 +44,19 @@ class application
     public $first_name = null;
     public $last_name = null;
 
+    public $page_size = 10;
+    public $page = 1;
+    public $record_count = 0;
+
     function __construct()
     {
-        
+
         /*
         $pwd = "";
         $test = SA_Encryption::encrypt_to_url_param($pwd);
         h1 ($test);
         */
-        
+
         $this->application_name = "Smart Signposting Data Management";
         $this->url = $_SERVER['PHP_SELF'];
         array_push($this->yes_no, new data_item("yes", "Yes"));
@@ -387,8 +391,7 @@ class application
                 array_push($this->headers, $obj);
                 if ($obj->trade_type == "IMPORT") {
                     array_push($this->headers_import, $obj);
-                }
-                elseif ($obj->trade_type == "EXPORT") {
+                } elseif ($obj->trade_type == "EXPORT") {
                     array_push($this->headers_export, $obj);
                 }
             }
@@ -414,11 +417,9 @@ class application
                 array_push($this->subheaders, $obj);
                 if ($obj->trade_type == "IMPORT") {
                     array_push($this->subheaders_import, $obj);
-                }
-                elseif ($obj->trade_type == "EXPORT") {
+                } elseif ($obj->trade_type == "EXPORT") {
                     array_push($this->subheaders_export, $obj);
                 }
-
             }
         }
     }
@@ -426,34 +427,26 @@ class application
     public function get_content()
     {
         global $conn;
-        $sql = "select ss.id, step_description, step_howto_description, step_url, -- ss.header_id, ss.subheader_id, 
-        ssh.header_description, sss.subheader_description 
-        from signposting_steps ss, signposting_step_headers ssh, signposting_step_subheaders sss 
-        where ss.header_id = ssh.id
-        and ss.subheader_id = sss.id
-        order by id";
 
-        $sql = "select ss.id, step_description, step_howto_description, step_url
-        from signposting_steps ss 
-        order by id";
-
+        $sql = "with cte as (
+        select ss.id, step_description, step_howto_description, step_url
+        from signposting_steps ss order by id
+        )
+        select *, count(*) OVER() AS record_count from cte
+        limit $this->page_size offset $this->page_size * ($this->page - 1);";
 
         $result = pg_query($conn, $sql);
         $this->content = array();
+        $this->record_count = 0;
         if ($result) {
             while ($row = pg_fetch_array($result)) {
+                $this->record_count = $row["record_count"];
                 $obj = new content;
                 $obj->id = $row['id'];
                 $obj->step_description = $row['step_description'];
                 $obj->step_howto_description = $row['step_howto_description'];
                 $obj->step_url = $row['step_url'];
-                
-                /*
-                $obj->header_id = $row['header_id'];
-                $obj->subheader_id = $row['subheader_id'];
-                $obj->header_description = $row['header_description'];
-                $obj->subheader_description = $row['subheader_description'];
-                */
+
                 array_push($this->content, $obj);
             }
         }
@@ -727,5 +720,45 @@ class application
 
         $url = "/";
         header("Location: " . $url);
+    }
+
+    function get_page()
+    {
+        $p = get_querystring("p");
+        if ($p != "") {
+            $this->page = $p;
+        }
+        $ps = get_querystring("ps");
+        if ($ps != "") {
+            $this->page_size = $ps;
+        }
+        $this->page_size = max($this->page_size, 1);
+        $this->page = max($this->page, 1);
+    }
+
+    function show_paging_controls()
+    {
+        /*
+        pre($this->page);
+        pre($this->page_size);
+        pre($this->record_count);
+        */
+        //pre ($_SERVER);
+        $page_count = intdiv($this->record_count - 1, $this->page_size) + 1;
+        echo ('<div class="govuk-body">');
+        for ($i = 1; $i <= $page_count; $i++) {
+            $item = '<span class="page">';
+            if ($i != $this->page) {
+                $url = "/content/?p=$i&ps=$this->page_size";
+                $item .= "<a class='govuk-link' href='" . $url . "'>";
+            }
+            $item .= $i;
+            if ($i != $this->page) {
+                $item .= "</a>";
+            }
+            $item .= '</span>';
+            echo ($item);
+        }
+        echo ('</div>');
     }
 }
