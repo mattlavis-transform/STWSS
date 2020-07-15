@@ -364,7 +364,6 @@ function yn3($var)
 }
 function yn4($var)
 {
-    //h1 (gettype($var));
     if ($var == 't') {
         return ("Yes");
     } else {
@@ -398,14 +397,12 @@ function standardise_date($var)
         return ($var);
     } else {
         $d2 = date("d/m/Y", strtotime($var));
-        #h1 ($pos);
         return ($d2);
     }
 }
 
 function rowclass($validity_start_date, $validity_end_date)
 {
-    #h1 ($validity_end_date);
     $validity_start_date = standardise_date($validity_start_date);
     $validity_end_date = standardise_date($validity_end_date);
 
@@ -719,7 +716,6 @@ function format_goods_nomenclature_item_id($s, $size_class = "")
 
 function format_goods_nomenclature_item_id2($s, $leaf, $size_class = "")
 {
-    //h1 ($leaf);
     $gn = new goods_nomenclature();
     $s2 = "";
     if ($leaf == "N") {
@@ -797,7 +793,6 @@ function get_operation($s)
 {
     switch ($s) {
         case "U":
-            #h1 ("here");
             $s2 = "1";
             break;
         case "D":
@@ -1056,7 +1051,6 @@ function parse_placeholders($s, $obj = null)
             }
         }
     }
-    //h1 ($s);
     return ($s);
 }
 

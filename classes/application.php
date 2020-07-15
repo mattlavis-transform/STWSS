@@ -32,6 +32,7 @@ class application
 
     public $content = array();
     public $content_linkage = array();
+    public $trade_type_linkage = array();
     public $trade_types = array();
     public $content_linking_methods = array();
     public $yes_no = array();
@@ -47,6 +48,7 @@ class application
     public $page_size = 10;
     public $page = 1;
     public $record_count = 0;
+    public $content_records = array();
 
     function __construct()
     {
@@ -86,6 +88,24 @@ class application
                 }
             }
         }
+    }
+
+    static public function array_to_list($arr)
+    {
+        $s = "";
+        $count = count($arr);
+        $index = 0;
+        foreach ($arr as $item) {
+            $index += 1;
+            $s .= $item;
+            if ($index != $count) {
+                $s .= ", ";
+            }
+        }
+        if ($s == "") {
+            $s = -1;
+        }
+        return ($s);
     }
 
     static public function debug()
@@ -438,6 +458,7 @@ class application
         $result = pg_query($conn, $sql);
         $this->content = array();
         $this->record_count = 0;
+        $this->content_records = array();
         if ($result) {
             while ($row = pg_fetch_array($result)) {
                 $this->record_count = $row["record_count"];
@@ -448,6 +469,7 @@ class application
                 $obj->step_url = $row['step_url'];
 
                 array_push($this->content, $obj);
+                array_push($this->content_records, $obj->id);
             }
         }
     }
@@ -455,28 +477,31 @@ class application
     public function get_content_linkage()
     {
         global $conn;
+        
+        $records = application::array_to_list($this->content_records);
+        
         $sql = "with cte as (
-            select sssa.id, signposting_step_id, 'Section ' || s.numeral as entity_id, 1 as priority, s.title as description, 'section' as link_type
-            from signposting_step_section_assignment sssa, sections s
-            where sssa.section_id = s.id 
-            union
-            select ssca.id, signposting_step_id, 'Chapter ' || c.id as entity_id, 2 as priority, c.description, 'chapter' as link_type
-            from signposting_step_chapter_assignment ssca, chapters c
-            where ssca.chapter_id = cast(c.id as int)
-            union
-            select ssmta.id, signposting_step_id, 'Measure type ' || mt.measure_type_id as entity_id, 4 as priority, mt.description, 'measure_type' as link_type
-            from signposting_step_measure_type_assignment ssmta, measure_types mt
-            where ssmta.measure_type_id = mt.measure_type_id 
-            union
-            select ssdca.id, signposting_step_id, 'Document code ' || c.code as entity_id, 5 as priority, c.description, 'document_code' as link_type
-            from signposting_step_document_code_assignment ssdca, certificates c
-            where ssdca.document_code = c.code
-
+        select sssa.id, signposting_step_id, 'Section ' || s.numeral as entity_id, 1 as priority, s.title as description, 'section' as link_type
+        from signposting_step_section_assignment sssa, sections s
+        where sssa.section_id = s.id 
+        union
+        select ssca.id, signposting_step_id, 'Chapter ' || c.id as entity_id, 2 as priority, c.description, 'chapter' as link_type
+        from signposting_step_chapter_assignment ssca, chapters c
+        where ssca.chapter_id = cast(c.id as int)
+        union
+        select ssmta.id, signposting_step_id, 'Measure type ' || mt.measure_type_id as entity_id, 4 as priority, mt.description, 'measure_type' as link_type
+        from signposting_step_measure_type_assignment ssmta, measure_types mt
+        where ssmta.measure_type_id = mt.measure_type_id 
+        union
+        select ssdca.id, signposting_step_id, 'Document code ' || c.code as entity_id, 5 as priority, c.description, 'document_code' as link_type
+        from signposting_step_document_code_assignment ssdca, certificates c
+        where ssdca.document_code = c.code
         )
-        select * from cte order by priority, id";
+        select * from cte where signposting_step_id in (" . $records . ") order by priority, id";
         $result = pg_query($conn, $sql);
         $this->content_linkage = array();
-        if ($result) {
+        $row_count = pg_num_rows($result);
+        if (($result) && ($row_count > 0)) {
             while ($row = pg_fetch_array($result)) {
                 $obj = new content_linkage;
                 $obj->id = $row['id'];
@@ -494,6 +519,48 @@ class application
             foreach ($this->content_linkage as $l) {
                 if ($c->id == $l->signposting_step_id) {
                     array_push($c->linkage, $l);
+                }
+            }
+        }
+    }
+
+
+    public function get_content_trade_types_headings()
+    {
+        global $conn;
+        
+        $records = application::array_to_list($this->content_records);
+        
+        $sql = "with cte as (
+        select ssha.id, signposting_step_id, ssha.trade_type, ssha.header_id, ssha.subheader_id,
+        ssh.header_description, sss.subheader_description, ssh.order_index as o1, sss.order_index as o2
+        from signposting_step_heading_assignment ssha, signposting_step_headers ssh, signposting_step_subheaders sss 
+        where ssha.header_id = ssh.id 
+        and ssha.subheader_id = sss.id 
+        )
+        select * from cte where signposting_step_id in (" . $records . ") order by trade_type, o1, o2";
+        $result = pg_query($conn, $sql);
+        $this->trade_type_linkage = array();
+        $row_count = pg_num_rows($result);
+        if (($result) && ($row_count > 0)) {
+            while ($row = pg_fetch_array($result)) {
+                $obj = new reusable;
+                $obj->id                    = $row['id'];
+                $obj->signposting_step_id   = $row['signposting_step_id'];
+                $obj->trade_type            = $row['trade_type'];
+                $obj->header_id             = $row['header_id'];
+                $obj->subheader_id          = $row['subheader_id'];
+                $obj->header_description    = $row['header_description'];
+                $obj->subheader_description = $row['subheader_description'];
+
+                array_push($this->trade_type_linkage, $obj);
+            }
+        }
+
+        foreach ($this->content as $c) {
+            foreach ($this->trade_type_linkage as $l) {
+                if ($c->id == $l->signposting_step_id) {
+                    array_push($c->trade_types, $l);
                 }
             }
         }
@@ -738,12 +805,6 @@ class application
 
     function show_paging_controls()
     {
-        /*
-        pre($this->page);
-        pre($this->page_size);
-        pre($this->record_count);
-        */
-        //pre ($_SERVER);
         $page_count = intdiv($this->record_count - 1, $this->page_size) + 1;
         echo ('<div class="govuk-body">');
         for ($i = 1; $i <= $page_count; $i++) {

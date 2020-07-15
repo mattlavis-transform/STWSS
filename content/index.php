@@ -5,6 +5,7 @@ $app = new application();
 $app->get_page();
 $app->get_content();
 $app->get_content_linkage();
+$app->get_content_trade_types_headings();
 ?>
 <!DOCTYPE html>
 <html lang="en" class="govuk-template ">
@@ -97,6 +98,7 @@ require("../includes/meta.php");
                             <tr class="govuk-table__row">
                                 <th scope="col" class="govuk-table__header">ID</th>
                                 <th scope="col" class="govuk-table__header">Content</th>
+                                <th scope="col" class="govuk-table__header">Trade type / heading</th>
                                 <th scope="col" class="govuk-table__header">Linked&nbsp;to</th>
                                 <th scope="col" class="govuk-table__header">Actions</th>
                             </tr>
@@ -109,27 +111,47 @@ require("../includes/meta.php");
                                     <td class="govuk-table__cell"><?= $c->id ?></td>
                                     <td class="govuk-table__cell">
                                         <b><?= $c->step_description ?></b><br />
-                                        <?= $c->step_howto_description ?><br />
+                                        <?php if ($c->step_howto_description != "") {
+                                            echo ($c->step_howto_description . "</br>");
+                                        } ?>
                                         <a target="_blank" rel="noopener noreferrer" href="<?= $c->step_url ?>"><?= $c->step_url ?></a><br /><br />
                                         <!--<em>Assigned to section / subsection:</em><br />
                                         &gt; <?= $c->header_description ?><br />
                                         &gt; <?= $c->subheader_description ?>//-->
+                                    </td>
+                                    <td class="govuk-table__cell">
+                                    <?php
+                                        if (count($c->trade_types) == 0) {
+                                            echo ("Not linked to any database entities");
+                                        } else {
+                                            echo ('<ul class="govuk-list govuk-list--m xgovuk-list--bullet">');
+                                            foreach ($c->trade_types as $tt) {
+                                                //pre ($tt);
+                                                echo ("<li>");
+                                                echo ("<strong>" . $tt->trade_type . "</strong><br />");
+                                                echo ("&gt;&nbsp;" . $tt->header_description . "<br />");
+                                                echo ("&gt;&nbsp;" . $tt->subheader_description . "<br />");
+                                                echo ("</li>");
+                                            }
+                                            echo ("</ul>");
+                                        }
+                                        ?>
                                     </td>
                                     <td class="govuk-table__cell" style="width:30%">
                                         <?php
                                         if (count($c->linkage) == 0) {
                                             echo ("Not linked to any database entities");
                                         } else {
-                                            echo ('<ol class="govuk-list govuk-list--m govuk-list--number">');
+                                            echo ('<ul class="govuk-list govuk-list--m govuk-list--bullet">');
                                             foreach ($c->linkage as $l) {
                                                 //pre ($l);
-                                                $remove_url = "/includes/routes.php?action=delete_content_linkage&src=content_index&link_type=" . $l->link_type . "&sid=" . $l->id. "&id=" . $c->id;
+                                                $remove_url = "/includes/routes.php?action=delete_content_linkage&src=content_index&link_type=" . $l->link_type . "&sid=" . $l->id . "&id=" . $c->id;
                                                 echo ("<li>");
                                                 echo ($l->entity_id . " - " . $l->description . "&nbsp;");
                                                 echo ("<a class='govuk-link' href='" . $remove_url . "'><i class='fas fa-trash-alt'></i></a>");
                                                 echo ("</li>");
                                             }
-                                            echo ("</ol>");
+                                            echo ("</ul>");
                                         }
                                         ?>
                                     </td>

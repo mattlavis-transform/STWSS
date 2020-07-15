@@ -205,6 +205,7 @@ class content
             $this->id, $section_id
         ));
         $this->unblanket();
+        application::debug();
     }
 
 
