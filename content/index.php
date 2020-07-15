@@ -137,7 +137,7 @@ require("../includes/meta.php");
                                         }
                                         ?>
                                     </td>
-                                    <td class="govuk-table__cell" style="width:30%">
+                                    <td class="govuk-table__cell" style="min-width:30%;padding-right:1em">
                                         <?php
                                         if (count($c->linkage) == 0) {
                                             echo ("Not linked to any database entities");
