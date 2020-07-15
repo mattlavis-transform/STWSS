@@ -129,8 +129,10 @@ require("../includes/meta.php");
                                                 //pre ($tt);
                                                 echo ("<li>");
                                                 echo ("<strong>" . $tt->trade_type . "</strong><br />");
-                                                echo ("&gt;&nbsp;" . $tt->header_description . "<br />");
-                                                echo ("&gt;&nbsp;" . $tt->subheader_description . "<br />");
+                                                //echo ("<div>" . $tt->header_description . "</div>");
+                                                //echo ("<div class='indent'><span class='indent2'>" . $tt->subheader_description . "</span></div>");
+
+                                                echo ("<div>" . $tt->header_description . " &gt; " . $tt->subheader_description . "</div>");
                                                 echo ("</li>");
                                             }
                                             echo ("</ul>");

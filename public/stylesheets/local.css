@@ -60,7 +60,7 @@
     font-size: 14px !important;
 }
 
-.govuk-table--s td ol.govuk-list--m li, .govuk-table--s td ul.govuk-list--m li{
+.govuk-table--s td ol.govuk-list--m li, .govuk-table--s td ul.govuk-list--m li {
     font-size: 14px !important;
 }
 
@@ -187,3 +187,10 @@ i.far {
 /*
 table tbody tr:last-child td, table tbody tr:last-child th { border:0px }
 */
+
+div.indent2 {
+    padding-left: 1em;
+}
+div.indent:before {
+    content: "- ";
+}
