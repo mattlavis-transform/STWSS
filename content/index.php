@@ -122,7 +122,7 @@ require("../includes/meta.php");
                                     <td class="govuk-table__cell" style="min-width:30%">
                                         <?php
                                         if (count($c->trade_types) == 0) {
-                                            echo ("Not linked to any database entities");
+                                            echo ("Not linked to any trade types or headings"); // This should not be possible
                                         } else {
                                             echo ('<ul class="govuk-list govuk-list--m xgovuk-list--bullet">');
                                             foreach ($c->trade_types as $tt) {
@@ -140,7 +140,7 @@ require("../includes/meta.php");
                                     <td class="govuk-table__cell" style="min-width:30%;padding-right:1em">
                                         <?php
                                         if (count($c->linkage) == 0) {
-                                            echo ("Not linked to any database entities");
+                                            echo ("Not restricted to any database entities");
                                         } else {
                                             echo ('<ul class="govuk-list govuk-list--m govuk-list--bullet">');
                                             foreach ($c->linkage as $l) {
