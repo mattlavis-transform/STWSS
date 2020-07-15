@@ -26,6 +26,7 @@ require(dirname(__FILE__) . "../../components/button.php");
 require(dirname(__FILE__) . "../../components/input.php");
 require(dirname(__FILE__) . "../../components/textarea.php");
 require(dirname(__FILE__) . "../../components/radio.php");
+require(dirname(__FILE__) . "../../components/checkbox.php");
 require(dirname(__FILE__) . "../../components/inset.php");
 require(dirname(__FILE__) . "../../components/error_summary.php");
 

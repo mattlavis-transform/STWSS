@@ -5,6 +5,8 @@ $app->get_headers();
 $app->check_for_errors();
 $app->get_subheaders();
 $app->get_content_linking_methods();
+$app->get_trade_types();
+
 $content = new content();
 $content->populate();
 if ($content->id != "") {
@@ -79,9 +81,21 @@ require("../includes/meta.php");
                             new textarea("step_description", "Step title", "This is the content which will be displayed in the step's hyperlink", false, 3, $content->step_description);
                             new textarea("step_howto_description", "Explanatory text", "Optionally, add some explanatory text to advise users further", false, 2, $content->step_howto_description);
                             new textarea("step_url", "URL", "Please enter the full URL including the https://", false, 2, $content->step_url);
-                            new select("header", $app->headers, "Select the heading to which this content belongs", "", false, $content->header_id);
-                            new select("subheader", $app->subheaders, "Select the subheading to which this content belongs", "", false, $content->subheader_id);
+                            
+                            new checkbox("trade_type", $app->trade_types, "Select a trade type", "Identify if this content is to apply to import trade or all export trade. If you do not explicitly link the step to any other entities, then the step will apply to this trade type under all circumstances.", false, "", "govuk-fieldset__legend--s");
+
+                            echo ("<div id='import_header'>");
+                            new select("header", $app->headers, "Select the import heading", "", false, $content->header_id, "");
+                            new select("subheader", $app->subheaders, "Select the import subheading", "", false, $content->subheader_id, "");
+                            echo ("</div>");
+
+                            echo ("<div id='export_header'>");
+                            new select("header", $app->headers, "Select the export heading", "", false, $content->header_id, "");
+                            new select("subheader", $app->subheaders, "Select the export subheading", "", false, $content->subheader_id, "");
+                            echo ("</div>");
+
                             //new input("country_exclusions", "Country exclusions", "Optionally, enter a comma-delimited list of 2-digit country codes to which this content does not apply", false, $content->country_exclusions, "", "");
+
                             new hidden("id", $content->id);
                             new hidden("country_exclusions", "");
                             new hidden("sid", $app->sid);

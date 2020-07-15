@@ -35,6 +35,8 @@ $(document).ready(function () {
     if (id == "") {
         $("#subheader").prop("disabled", true);
     }
+    $("#import_header").hide();
+    $("#export_header").hide();
 
     $("#header").on("change", function () {
         var header_id = $(this).children("option:selected").val();
@@ -59,4 +61,26 @@ $(document).ready(function () {
             });
         }
     });
+
+    
+
+    $("#trade_type_IMPORT").on("click", function () {
+        checked = $(this).prop("checked");
+        if (checked) {
+            $("#import_header").show();
+        } else {
+            $("#import_header").hide();
+        }
+    });
+
+    $("#trade_type_EXPORT").on("click", function () {
+        checked = $(this).prop("checked");
+        if (checked) {
+            $("#export_header").show();
+        } else {
+            $("#export_header").hide();
+        }
+    });
+
+
 });

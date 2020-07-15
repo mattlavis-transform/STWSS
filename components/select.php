@@ -11,15 +11,16 @@ class select
     public $error_class = "";
     public $error_state = false;
 
-    function __construct($id, $data, $label, $hint, $mandatory, $value)
+    function __construct($id, $data, $label, $hint, $mandatory, $value, $label_class = "govuk-label--s")
     {
-        $this->id = $id;
-        $this->data = $data;
-        $this->label = $label;
-        $this->hint = $hint;
-        $this->mandatory = $mandatory;
-        $this->value = $value;
+        $this->id           = $id;
+        $this->data         = $data;
+        $this->label        = $label;
+        $this->hint         = $hint;
+        $this->mandatory    = $mandatory;
+        $this->value        = $value;
         $this->error_class  = "";
+        $this->label_class  = $label_class;
 
         $this->display();
     }
@@ -33,7 +34,7 @@ class select
         }
 ?>
         <div class="govuk-form-group  <?= $this->error_class ?>">
-            <label class="govuk-label govuk-label--s" for="<?= $this->id ?>">
+            <label class="govuk-label <?= $this->label_class ?> for=" <?= $this->id ?>">
                 <?= $this->label ?>
             </label>
             <?php
