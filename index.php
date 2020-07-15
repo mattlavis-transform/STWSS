@@ -37,7 +37,7 @@
                     <p class="govuk-body"><a href="/commodities">Commodity codes</a></p>
                     <p class="govuk-body"><a href="/measure_types">Measure types</a></p>
                     <p class="govuk-body"><a href="/document_codes">Document codes</a></p>
-                    <p class="govuk-body"><a href="/trade_types">Trade types</a></p>
+                    <!--<p class="govuk-body"><a href="/trade_types">Trade types</a></p>//-->
                 </div>
             </div>
         </main>

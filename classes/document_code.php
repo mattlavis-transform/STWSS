@@ -34,11 +34,9 @@ class document_code
     {
         global $conn;
         $sql = "select ssdca.id as unique_id, ssdca.document_code, ss.id, ss.step_description, ss.step_description, ss.step_howto_description,
-        ss.step_url, ss.header_id, ss.subheader_id, ssh.header_description, sss.subheader_description
-        from signposting_step_document_code_assignment ssdca, signposting_steps ss, signposting_step_headers ssh, signposting_step_subheaders sss 
+        ss.step_url
+        from signposting_step_document_code_assignment ssdca, signposting_steps ss
         where ss.id = ssdca.signposting_step_id 
-        and ss.header_id = ssh.id 
-        and ss.subheader_id = sss.id 
         and ssdca.document_code = $1
         order by ss.id;";
         pg_prepare($conn, "get_signposting_steps", $sql);
@@ -52,13 +50,14 @@ class document_code
                 $content->step_description = $row['step_description'];
                 $content->step_howto_description = $row['step_howto_description'];
                 $content->step_url = $row['step_url'];
+                /*
                 $content->header_id = $row['header_id'];
                 $content->subheader_id = $row['subheader_id'];
                 $content->header_description = $row['header_description'];
                 $content->subheader_description = $row['subheader_description'];
+                */
                 array_push($this->content, $content);
             }
         }
-        return ($content);
     }
 }
