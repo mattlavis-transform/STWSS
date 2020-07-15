@@ -119,7 +119,7 @@ require("../includes/meta.php");
                                         &gt; <?= $c->header_description ?><br />
                                         &gt; <?= $c->subheader_description ?>//-->
                                     </td>
-                                    <td class="govuk-table__cell">
+                                    <td class="govuk-table__cell" style="min-width:30%">
                                     <?php
                                         if (count($c->trade_types) == 0) {
                                             echo ("Not linked to any database entities");
