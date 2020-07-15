@@ -374,8 +374,8 @@ class application
     public function get_headers()
     {
         global $conn;
-        $sql = "select id, header_description as description, trade_type
-        from signposting_step_headers order by 1";
+        $sql = "select id, (order_index || '. ' || header_description) as description, trade_type
+        from signposting_step_headers order by order_index";
         $result = pg_query($conn, $sql);
         $this->headers = array();
         if ($result) {
@@ -401,7 +401,7 @@ class application
         $sql = "select sss.id, sss.subheader_description as description, sss.header_id, ssh.trade_type 
         from signposting_step_subheaders sss, signposting_step_headers ssh 
         where sss.header_id = ssh.id 
-        order by 1";
+        order by ssh.order_index, sss.order_index";
         $result = pg_query($conn, $sql);
         $this->subheaders = array();
         if ($result) {

@@ -126,9 +126,6 @@ class content
             case "document_code":
                 $this->link_document_code();
                 break;
-            case "trade_type":
-                $this->link_trade_type();
-                break;
         }
 
         $c = new confirmation();
@@ -170,10 +167,6 @@ class content
                 $this->unlink_document_code($sid);
                 $url = "/";
                 break;
-            case "trade_type":
-                $this->unlink_trade_type($sid);
-                $url = "/";
-                break;
         }
 
         switch ($src) {
@@ -199,7 +192,7 @@ class content
     public function link_section()
     {
         global $conn;
-        $id = get_querystring("id");
+        $this->id = get_querystring("id");
         $section_id = get_querystring("section");
         $sql = "INSERT INTO signposting_step_section_assignment
         (signposting_step_id, section_id, date_created)
@@ -208,15 +201,16 @@ class content
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         pg_execute($conn, $command, array(
-            $id, $section_id
+            $this->id, $section_id
         ));
+        $this->unblanket();
     }
 
 
     public function link_chapter()
     {
         global $conn;
-        $id = get_querystring("id");
+        $this->id = get_querystring("id");
         $chapter = intval(get_querystring("chapter"));
         $sql = "INSERT INTO signposting_step_chapter_assignment
         (signposting_step_id, chapter_id, date_created)
@@ -225,14 +219,15 @@ class content
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         pg_execute($conn, $command, array(
-            $id, $chapter
+            $this->id, $chapter
         ));
+        $this->unblanket();
     }
 
     public function link_document_code()
     {
         global $conn;
-        $id = get_querystring("id");
+        $this->id = get_querystring("id");
         $document_code = get_querystring("document_code");
         $sql = "INSERT INTO signposting_step_document_code_assignment
         (signposting_step_id, document_code, date_created)
@@ -241,14 +236,15 @@ class content
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         pg_execute($conn, $command, array(
-            $id, $document_code
+            $this->id, $document_code
         ));
+        $this->unblanket();
     }
 
     public function link_measure_type()
     {
         global $conn;
-        $id = get_querystring("id");
+        $this->id = get_querystring("id");
         $measure_type = get_querystring("measure_type");
         $sql = "INSERT INTO signposting_step_measure_type_assignment
         (signposting_step_id, measure_type_id, date_created)
@@ -257,14 +253,15 @@ class content
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         pg_execute($conn, $command, array(
-            $id, $measure_type
+            $this->id, $measure_type
         ));
+        $this->unblanket();
     }
 
     public function link_commodity()
     {
         global $conn;
-        $id = get_querystring("id");
+        $this->id = get_querystring("id");
         $commodity = new commodity();
         $action = get_querystring("action");
         if ($action == "create_content") {
@@ -299,29 +296,14 @@ class content
             $command = uniqid();
             pg_prepare($conn, $command, $sql);
             pg_execute($conn, $command, array(
-                $id, $commodity->goods_nomenclature_sid
+                $this->id, $commodity->goods_nomenclature_sid
             ));
 
             h1("found");
         } else {
             h1("not found");
         };
-    }
-
-    public function link_trade_type()
-    {
-        global $conn;
-        $id = get_querystring("id");
-        $chapter = intval(get_querystring("chapter"));
-        $sql = "INSERT INTO signposting_step_chapter_assignment
-        (signposting_step_id, chapter_id, date_created)
-        VALUES ($1, $2, current_timestamp)
-        on conflict ON CONSTRAINT signposting_step_chapter_assignment_un DO NOTHING";
-        $command = uniqid();
-        pg_prepare($conn, $command, $sql);
-        pg_execute($conn, $command, array(
-            $id, $chapter
-        ));
+        $this->unblanket();
     }
 
     public function unlink_section($sid)
@@ -372,17 +354,6 @@ class content
     {
         global $conn;
         $sql = "DELETE FROM signposting_step_document_code_assignment where id = $1";
-        $command = uniqid();
-        pg_prepare($conn, $command, $sql);
-        pg_execute($conn, $command, array(
-            $sid
-        ));
-    }
-
-    public function unlink_trade_type($sid)
-    {
-        global $conn;
-        $sql = "DELETE FROM signposting_step_trade_type_assignment where id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         pg_execute($conn, $command, array(
@@ -511,7 +482,7 @@ class content
     function update()
     {
         global $conn;
-    
+
         $this->trade_types = get_request("trade_type");
         if (in_array("IMPORT", $this->trade_types)) {
             $this->header_id_import = get_request("header_import");
@@ -639,7 +610,6 @@ class content
     {
         global $conn, $app;
 
-
         $this->trade_types = get_request("trade_type");
         if (in_array("IMPORT", $this->trade_types)) {
             $this->header_id_import = get_request("header_import");
@@ -689,39 +659,42 @@ class content
         // Get the ID back
         if (($result) && (pg_num_rows($result) > 0)) {
             $row = pg_fetch_row($result);
-            $id = $row[0];
+            $this->id = $row[0];
         }
 
         // Insert the import header / subheader link
-        if (($this->header_id_import != "") && ($this->header_id_import != "")) {
+        if (($this->header_id_import != "") && ($this->subheader_id_import != "")) {
             $sql = "INSERT INTO signposting_step_heading_assignment
             (signposting_step_id, trade_type, header_id, subheader_id, date_created)
             VALUES ($1, $2, $3, $4, current_timestamp)";
             $command = uniqid();
             pg_prepare($conn, $command, $sql);
             $result = pg_execute($conn, $command, array(
-                $id,
+                $this->id,
                 "IMPORT",
                 $this->header_id_import,
                 $this->subheader_id_import
             ));
+            $this->assign_trade_type("IMPORT", true);
         }
 
 
         // Insert the export header / subheader link
-        if (($this->header_id_export != "") && ($this->header_id_export != "")) {
+        if (($this->header_id_export != "") && ($this->subheader_id_export != "")) {
             $sql = "INSERT INTO signposting_step_heading_assignment
             (signposting_step_id, trade_type, header_id, subheader_id, date_created)
             VALUES ($1, $2, $3, $4, current_timestamp)";
             $command = uniqid();
             pg_prepare($conn, $command, $sql);
             $result = pg_execute($conn, $command, array(
-                $id,
+                $this->id,
                 "EXPORT",
                 $this->header_id_export,
                 $this->subheader_id_export
             ));
+            $this->assign_trade_type("EXPORT", true);
         }
+
 
         // Insert the country exclusions, if needed
         /*
@@ -750,7 +723,7 @@ class content
                 $command = uniqid();
                 pg_prepare($conn, $command, $sql);
                 $result = pg_execute($conn, $command, array(
-                    $id,
+                    $this->id,
                     $sid
                 ));
                 break;
@@ -762,7 +735,7 @@ class content
                 $command = uniqid();
                 pg_prepare($conn, $command, $sql);
                 $result = pg_execute($conn, $command, array(
-                    $id,
+                    $this->id,
                     $sid
                 ));
                 break;
@@ -775,7 +748,7 @@ class content
                 $command = uniqid();
                 pg_prepare($conn, $command, $sql);
                 $result = pg_execute($conn, $command, array(
-                    $id,
+                    $this->id,
                     $sid
                 ));
                 break;
@@ -787,7 +760,7 @@ class content
                 $command = uniqid();
                 pg_prepare($conn, $command, $sql);
                 $result = pg_execute($conn, $command, array(
-                    $id,
+                    $this->id,
                     $sid
                 ));
                 break;
@@ -798,7 +771,7 @@ class content
                 $command = uniqid();
                 pg_prepare($conn, $command, $sql);
                 $result = pg_execute($conn, $command, array(
-                    $id,
+                    $this->id,
                     $sid
                 ));
                 break;
@@ -810,7 +783,7 @@ class content
                 $command = uniqid();
                 pg_prepare($conn, $command, $sql);
                 $result = pg_execute($conn, $command, array(
-                    $id,
+                    $this->id,
                     $sid
                 ));
                 break;
@@ -818,17 +791,43 @@ class content
 
         // Then redirect to the confirmation page
         $c = new confirmation();
-        $c->panel_title = "Content item " . $id . " has been successfully created";
+        $c->panel_title = "Content item " . $this->id . " has been successfully created";
         $c->panel_body = "";
-        $c->step1 = "<a class='govuk-link' href='/content/link_01.html?id=" . $id . "'>Link to this content</a>";
-        $c->step2 = "<a class='govuk-link' href='/content/edit.html?id=" . $id . "'>View this content item</a>";
+        $c->step1 = "<a class='govuk-link' href='/content/link_01.html?id=" . $this->id . "'>Link to this content</a>";
+        $c->step2 = "<a class='govuk-link' href='/content/edit.html?id=" . $this->id . "'>View this content item</a>";
         $c->step3 = "<a class='govuk-link' href='/content'>View all content</a>";
         $c->encrypt_data();
         $url = "/includes/confirm.html?data=" . $c->data_encrypted;
         header("Location: " . $url);
     }
 
+    function assign_trade_type($trade_type, $blanket_apply)
+    {
+        global $conn;
+        // Insert the trade type(s)
+        $sql = "INSERT INTO signposting_step_trade_type_assignment
+        (signposting_step_id, trade_type, blanket_apply, date_created)
+        VALUES ($1, $2, $3, current_timestamp)";
+        $command = uniqid();
+        pg_prepare($conn, $command, $sql);
+        $result = pg_execute($conn, $command, array(
+            $this->id,
+            $trade_type,
+            $blanket_apply
+        ));
+    }
 
+    function unblanket() {
+        global $conn;
+        // Called when the content item is updated to link to any reference data
+        $sql = "UPDATE signposting_step_trade_type_assignment
+        SET blanket_apply = false WHERE signposting_step_id = $1";
+        $command = uniqid();
+        pg_prepare($conn, $command, $sql);
+        $result = pg_execute($conn, $command, array(
+            $this->id
+        ));
+    }
 
     function delete()
     {
