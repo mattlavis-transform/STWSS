@@ -714,9 +714,9 @@ class content
             $this->subheader_id_export = null;
         }
 
-        $this->step_description = get_request("step_description");
-        $this->step_howto_description = get_request("step_howto_description");
-        $this->step_url = get_request("step_url");
+        $this->step_description = trim(get_request("step_description"));
+        $this->step_howto_description = trim(get_request("step_howto_description"));
+        $this->step_url = trim(get_request("step_url"));
         $this->country_exclusions = get_request("country_exclusions");
 
         // Do the validation
