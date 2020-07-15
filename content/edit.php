@@ -82,7 +82,7 @@ require("../includes/meta.php");
                             new textarea("step_howto_description", "Explanatory text", "Optionally, add some explanatory text to advise users further", false, 2, $content->step_howto_description);
                             new textarea("step_url", "URL", "Please enter the full URL including the https://", false, 2, $content->step_url);
                             
-                            new checkbox("trade_type", $app->trade_types, "Select a trade type", "Identify if this content is to apply to import trade or all export trade. If you do not explicitly link the step to any other entities, then the step will apply to this trade type under all circumstances.", false, "", "govuk-fieldset__legend--s");
+                            new checkbox("trade_type", $app->trade_types, "Select a trade type", "Identify if this content is to apply to import trade, export trade or both. If you do not explicitly link the step to any other entities, then the step will apply to the specified trade type(s) under all circumstances.", false, "", "govuk-fieldset__legend--s");
 
                             echo ("<div id='import_header'>");
                             new select("header", $app->headers, "Select the import heading", "", false, $content->header_id, "");
