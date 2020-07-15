@@ -35,8 +35,10 @@ $(document).ready(function () {
     if (id == "") {
         $("#subheader").prop("disabled", true);
     }
+    /*
     $("#import_header").hide();
     $("#export_header").hide();
+    */
 
     $("#header").on("change", function () {
         var header_id = $(this).children("option:selected").val();
@@ -63,7 +65,7 @@ $(document).ready(function () {
     });
 
     
-
+    /*
     $("#trade_type_IMPORT").on("click", function () {
         checked = $(this).prop("checked");
         if (checked) {
@@ -81,6 +83,6 @@ $(document).ready(function () {
             $("#export_header").hide();
         }
     });
-
+    */
 
 });

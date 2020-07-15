@@ -38,7 +38,7 @@ class checkbox
                 <?php
                 }
                 ?>
-                <div class="govuk-radios">
+                <div class="govuk-checkboxes">
                     <?php
                     foreach ($this->data as $item) {
                         $id = $this->id . "_" . $item->id;
