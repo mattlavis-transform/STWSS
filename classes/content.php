@@ -602,7 +602,7 @@ class content
 
             $url = "/content/edit.html?err=1&data=" . $this->data_encrypted;
             header("Location: " . $url);
-            return;
+            die();
         }
     }
 
