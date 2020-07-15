@@ -23,6 +23,13 @@ class application
     public $trade_type_content = array();
     public $headers = array();
     public $subheaders = array();
+
+    public $headers_import = array();
+    public $subheaders_import = array();
+
+    public $headers_export = array();
+    public $subheaders_export = array();
+
     public $content = array();
     public $content_linkage = array();
     public $trade_types = array();
@@ -367,7 +374,8 @@ class application
     public function get_headers()
     {
         global $conn;
-        $sql = "select id, header_description as description from signposting_step_headers order by 1";
+        $sql = "select id, header_description as description, trade_type
+        from signposting_step_headers order by 1";
         $result = pg_query($conn, $sql);
         $this->headers = array();
         if ($result) {
@@ -375,7 +383,14 @@ class application
                 $obj = new header;
                 $obj->id = $row['id'];
                 $obj->description = $row['description'];
+                $obj->trade_type = $row['trade_type'];
                 array_push($this->headers, $obj);
+                if ($obj->trade_type == "IMPORT") {
+                    array_push($this->headers_import, $obj);
+                }
+                elseif ($obj->trade_type == "EXPORT") {
+                    array_push($this->headers_export, $obj);
+                }
             }
         }
     }
@@ -383,7 +398,10 @@ class application
     public function get_subheaders()
     {
         global $conn;
-        $sql = "select id, subheader_description as description, header_id from signposting_step_subheaders order by 1";
+        $sql = "select sss.id, sss.subheader_description as description, sss.header_id, ssh.trade_type 
+        from signposting_step_subheaders sss, signposting_step_headers ssh 
+        where sss.header_id = ssh.id 
+        order by 1";
         $result = pg_query($conn, $sql);
         $this->subheaders = array();
         if ($result) {
@@ -392,7 +410,15 @@ class application
                 $obj->id = $row['id'];
                 $obj->description = $row['description'];
                 $obj->header_id = $row['header_id'];
+                $obj->trade_type = $row['trade_type'];
                 array_push($this->subheaders, $obj);
+                if ($obj->trade_type == "IMPORT") {
+                    array_push($this->subheaders_import, $obj);
+                }
+                elseif ($obj->trade_type == "EXPORT") {
+                    array_push($this->subheaders_export, $obj);
+                }
+
             }
         }
     }
@@ -400,12 +426,18 @@ class application
     public function get_content()
     {
         global $conn;
-        $sql = "select ss.id, step_description, step_howto_description, step_url, ss.header_id, ss.subheader_id, 
+        $sql = "select ss.id, step_description, step_howto_description, step_url, -- ss.header_id, ss.subheader_id, 
         ssh.header_description, sss.subheader_description 
         from signposting_steps ss, signposting_step_headers ssh, signposting_step_subheaders sss 
         where ss.header_id = ssh.id
         and ss.subheader_id = sss.id
         order by id";
+
+        $sql = "select ss.id, step_description, step_howto_description, step_url
+        from signposting_steps ss 
+        order by id";
+
+
         $result = pg_query($conn, $sql);
         $this->content = array();
         if ($result) {
@@ -415,10 +447,13 @@ class application
                 $obj->step_description = $row['step_description'];
                 $obj->step_howto_description = $row['step_howto_description'];
                 $obj->step_url = $row['step_url'];
+                
+                /*
                 $obj->header_id = $row['header_id'];
                 $obj->subheader_id = $row['subheader_id'];
                 $obj->header_description = $row['header_description'];
                 $obj->subheader_description = $row['subheader_description'];
+                */
                 array_push($this->content, $obj);
             }
         }
@@ -428,25 +463,22 @@ class application
     {
         global $conn;
         $sql = "with cte as (
-            select sssa.id, signposting_step_id, 'Section ' || s.numeral as entity_id, 1 as priority, s.title as description
+            select sssa.id, signposting_step_id, 'Section ' || s.numeral as entity_id, 1 as priority, s.title as description, 'section' as link_type
             from signposting_step_section_assignment sssa, sections s
             where sssa.section_id = s.id 
             union
-            select ssca.id, signposting_step_id, 'Chapter ' || c.id as entity_id, 2 as priority, c.description
+            select ssca.id, signposting_step_id, 'Chapter ' || c.id as entity_id, 2 as priority, c.description, 'chapter' as link_type
             from signposting_step_chapter_assignment ssca, chapters c
             where ssca.chapter_id = cast(c.id as int)
             union
-            select ssmta.id, signposting_step_id, 'Measure type ' || mt.measure_type_id as entity_id, 4 as priority, mt.description
+            select ssmta.id, signposting_step_id, 'Measure type ' || mt.measure_type_id as entity_id, 4 as priority, mt.description, 'measure_type' as link_type
             from signposting_step_measure_type_assignment ssmta, measure_types mt
             where ssmta.measure_type_id = mt.measure_type_id 
             union
-            select ssdca.id, signposting_step_id, 'Document code ' || c.code as entity_id, 5 as priority, c.description
+            select ssdca.id, signposting_step_id, 'Document code ' || c.code as entity_id, 5 as priority, c.description, 'document_code' as link_type
             from signposting_step_document_code_assignment ssdca, certificates c
             where ssdca.document_code = c.code
-            union
-            select sstta.id, signposting_step_id, 'Trade type ' || sstta.trade_type as entity_id, 6 as priority, 
-            case when sstta.trade_type = 'IMPORT' then 'For all import trade' else 'For all export trade' end as description
-            from signposting_step_trade_type_assignment sstta
+
         )
         select * from cte order by priority, id";
         $result = pg_query($conn, $sql);
@@ -455,10 +487,12 @@ class application
             while ($row = pg_fetch_array($result)) {
                 $obj = new content_linkage;
                 $obj->id = $row['id'];
-                $obj->signposting_step_id = $row['signposting_step_id'];
-                $obj->entity_id = $row['entity_id'];
-                $obj->priority = $row['priority'];
-                $obj->description = $row['description'];
+                $obj->signposting_step_id   = $row['signposting_step_id'];
+                $obj->entity_id             = $row['entity_id'];
+                $obj->priority              = $row['priority'];
+                $obj->description           = $row['description'];
+                $obj->link_type             = $row['link_type'];
+
                 array_push($this->content_linkage, $obj);
             }
         }
@@ -627,7 +661,6 @@ class application
                 break;
             case "commodity":
                 $this->linkage_url .= "&commodity=" . $this->sid . "&commodity_code=" . $this->id;
-                pre($this);
                 break;
             case "measure_type":
                 $this->linkage_url .= "&measure_type=" . $this->sid;

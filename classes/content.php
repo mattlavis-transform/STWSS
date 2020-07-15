@@ -12,6 +12,22 @@ class content
     public $subheader_id            = null;
     public $header_description      = "";
     public $subheader_description   = "";
+
+    /* Fudge for import / export */
+    public $trade_types                     = array();
+    public $trade_types_and_headers         = array();
+
+    public $header_id_import                = null;
+    public $subheader_id_import             = null;
+    public $header_description_import       = "";
+    public $subheader_description_import    = "";
+
+    public $header_id_export                = null;
+    public $subheader_id_export             = null;
+    public $header_description_export       = "";
+    public $subheader_description_export    = "";
+
+
     public $errors                  = array();
 
     public $section_id              = null;
@@ -34,20 +50,47 @@ class content
             $this->button_face = "Update content item";
             $app->crumb_string = "Home|/;Content|/content;Content item " . $this->id . "|";
 
-            $sql = "select id, step_description, step_howto_description, step_url, header_id, subheader_id 
+            $sql = "select id, step_description, step_howto_description, step_url
             from signposting_steps ss where id = $1;";
             pg_prepare($conn, "get_content", $sql);
             $result = pg_execute($conn, "get_content", array($this->id));
             $row_count = pg_num_rows($result);
-            $content = new content();
             if (($result) && ($row_count > 0)) {
                 $row = pg_fetch_array($result);
                 $this->id = $row['id'];
                 $this->step_description = $row['step_description'];
                 $this->step_howto_description = $row['step_howto_description'];
                 $this->step_url = $row['step_url'];
-                $this->header_id = $row['header_id'];
-                $this->subheader_id = $row['subheader_id'];
+            }
+            // Get the trade type links too
+            $sql = "select trade_type, header_id, subheader_id
+            from signposting_step_heading_assignment where signposting_step_id = $1";
+            $stmt = uniqid();
+            pg_prepare($conn, $stmt, $sql);
+            $result = pg_execute($conn, $stmt, array($this->id));
+
+            $row_count = pg_num_rows($result);
+            if (($result) && ($row_count > 0)) {
+                while ($row = pg_fetch_array($result)) {
+                    $h = new reusable();
+                    $h->trade_type = $row['trade_type'];
+                    $h->header_id = $row['header_id'];
+                    $h->subheader_id = $row['subheader_id'];
+                    array_push($this->trade_types_and_headers, $h);
+                }
+            }
+
+            foreach ($this->trade_types_and_headers as $t) {
+                if ($t->trade_type == "IMPORT") {
+                    array_push($this->trade_types, "IMPORT");
+                    $this->header_id_import = $t->header_id;
+                    $this->subheader_id_import = $t->subheader_id;
+                }
+                if ($t->trade_type == "EXPORT") {
+                    array_push($this->trade_types, "EXPORT");
+                    $this->header_id_export = $t->header_id;
+                    $this->subheader_id_export = $t->subheader_id;
+                }
             }
         }
     }
@@ -59,7 +102,7 @@ class content
         array_push($this->link_options, new data_item("commodity", "Commodity code"));
         array_push($this->link_options, new data_item("measure_type", "Measure type"));
         array_push($this->link_options, new data_item("document_code", "Document code"));
-        array_push($this->link_options, new data_item("trade_type", "Trade type"));
+        //array_push($this->link_options, new data_item("trade_type", "Trade type"));
     }
 
     public function link()
@@ -101,7 +144,7 @@ class content
 
     public function unlink()
     {
-        $id = get_request("id");
+        $this->id = get_request("id");
         $sid = get_request("sid");
         $src = get_request("src");
         $link_type = get_request("link_type");
@@ -109,11 +152,11 @@ class content
         switch ($link_type) {
             case "section":
                 $this->unlink_section($sid);
-                $url = "/sections/view.html?id=" . $id . "#content";
+                $url = "/sections/view.html?id=" . $this->id . "#content";
                 break;
             case "chapter":
                 $this->unlink_chapter($sid);
-                $url = "/chapters/view.html?id=" . $id . "#content";
+                $url = "/chapters/view.html?id=" . $this->id . "#content";
                 break;
             case "commodity":
                 $this->unlink_commodity($sid);
@@ -132,15 +175,16 @@ class content
                 $url = "/";
                 break;
         }
+
         switch ($src) {
             case "content":
-                $url = "/content/edit.html?id=" . $id . "#linkage";
+                $url = "/content/edit.html?id=" . $this->id . "#linkage";
                 break;
             case "content_index":
-                $url = "/content";
+                $url = "/content#row_" . $this->id;
                 break;
             case "entity":
-                $url = "/" . $src . "/edit.html?id=" . $id . "#linkage";
+                $url = "/" . $src . "/edit.html?id=" . $this->id . "#linkage";
                 break;
             case "entity_index":
                 $url = "/" . application::get_plural($link_type);
@@ -352,58 +396,56 @@ class content
         switch ($link_type) {
             case "section":
                 $title = "Links to sections";
-                $sql = "select sssa.id, s.numeral as identifier, s.title as description, '/sections/view.html?id=' || s.id as view_url
+                $sql = "select sssa.id, s.numeral as identifier, s.title as description, '/sections/view.html?id=' || s.id as view_url, 'section' as link_type
                 from signposting_step_section_assignment sssa, sections s
                 where s.id = sssa.section_id 
                 and signposting_step_id = $1
                 order by section_id ;";
                 $link_url = "/content/link_02.html?link_type=section&id=" . $this->id;
                 break;
+
             case "chapter":
                 $title = "Links to chapters";
-                $sql = "select ssca.id, c.id as identifier, c.description, '/chapters/view.html?id=' || c.id as view_url
+                $sql = "select ssca.id, c.id as identifier, c.description, '/chapters/view.html?id=' || c.id as view_url, 'chapter' as link_type
                 from signposting_step_chapter_assignment ssca, chapters c
                 where cast(c.id as int) = ssca.chapter_id 
                 and signposting_step_id = $1
                 order by c.id ;";
                 $link_url = "/content/link_02.html?link_type=chapter&id=" . $this->id;
                 break;
+
             case "commodity":
                 $title = "Links to commodity codes";
-                $sql = "select ssca.id, gn.goods_nomenclature_item_id as identifier, gn.description, '/commodities/view.html?goods_nomenclature_item_id=' || gn.goods_nomenclature_item_id as view_url
+                $sql = "select ssca.id, gn.goods_nomenclature_item_id as identifier, gn.description,
+                '/commodities/view.html?goods_nomenclature_item_id=' || gn.goods_nomenclature_item_id as view_url, 'commodity' as link_type
                 from signposting_step_commodity_assignment ssca, goods_nomenclatures gn 
                 where gn.goods_nomenclature_sid = ssca.goods_nomenclature_sid 
                 and signposting_step_id = $1
                 order by gn.goods_nomenclature_item_id;";
                 $link_url = "/content/link_02.html?link_type=commodity&id=" . $this->id;
                 break;
+
             case "measure_type":
                 $title = "Links to measure types";
-                $sql = "select ssmta.id, mt.measure_type_id as identifier, mt.description, '/measure_types/view.html?id=' || mt.measure_type_id as view_url
+                $sql = "select ssmta.id, mt.measure_type_id as identifier, mt.description,
+                '/measure_types/view.html?id=' || mt.measure_type_id as view_url,
+                'measure_type' as link_type
                 from signposting_step_measure_type_assignment ssmta, measure_types mt
                 where mt.measure_type_id = ssmta.measure_type_id 
                 and signposting_step_id = $1
                 order by mt.measure_type_id;"; // This is dummy code
                 $link_url = "/content/link_02.html?link_type=measure_type&id=" . $this->id;
                 break;
+
             case "document_code":
                 $title = "Links to document codes";
-                $sql = "select ssdca.id, c.code as identifier, c.description, '/document_codes/view.html?id=' || c.code as view_url
+                $sql = "select ssdca.id, c.code as identifier, c.description, '/document_codes/view.html?id=' || c.code as view_url,
+                'document_code' as link_type
                 from signposting_step_document_code_assignment ssdca, certificates c
                 where c.code = ssdca.document_code 
                 and signposting_step_id = $1
                 order by c.code;";
                 $link_url = "/content/link_02.html?link_type=document_code&id=" . $this->id;
-                break;
-            case "trade_type":
-                $title = "Links to trade types";
-                $sql = "select sstta.id, sstta.trade_type as identifier,
-                case when sstta.trade_type = 'IMPORT' then 'For all import trade' else 'For all export trade' end as description,
-                '/trade_types/view.html?id=' || sstta.trade_type as view_url
-                from signposting_step_trade_type_assignment sstta
-                where signposting_step_id = $1
-                order by sstta.trade_type";
-                $link_url = "/content/link_02.html?link_type=trade_type&id=" . $this->id;
                 break;
         }
         $command = uniqid();
@@ -418,6 +460,7 @@ class content
                 $obj->identifier = $row['identifier'];
                 $obj->description = $row['description'];
                 $obj->view_url = $row['view_url'];
+                $obj->link_type = $row['link_type'];
                 array_push($this->linkage, $obj);
             }
             $this->show_linkage_table($title, $link_type, $link_url, $row_count);
@@ -468,11 +511,26 @@ class content
     function update()
     {
         global $conn;
+    
+        $this->trade_types = get_request("trade_type");
+        if (in_array("IMPORT", $this->trade_types)) {
+            $this->header_id_import = get_request("header_import");
+            $this->subheader_id_import = get_request("subheader_import");
+        } else {
+            $this->header_id_import = null;
+            $this->subheader_id_import = null;
+        }
+        if (in_array("EXPORT", $this->trade_types)) {
+            $this->header_id_export = get_request("header_export");
+            $this->subheader_id_export = get_request("subheader_export");
+        } else {
+            $this->header_id_export = null;
+            $this->subheader_id_export = null;
+        }
+
         $this->step_description = get_request("step_description");
         $this->step_howto_description = get_request("step_howto_description");
         $this->step_url = get_request("step_url");
-        $this->header_id = get_request("header");
-        $this->subheader_id = get_request("subheader");
         $this->country_exclusions = get_request("country_exclusions");
         $this->parse_country_exclusions();
 
@@ -496,18 +554,14 @@ class content
         step_description = $1,
         step_howto_description = $2,
         step_url = $3,
-        header_id = $4,
-        subheader_id = $5,
         date_updated = current_timestamp
-        WHERE id = $6";
+        WHERE id = $4";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         $result = pg_execute($conn, $command, array(
             $this->step_description,
             $this->step_howto_description,
             $this->step_url,
-            $this->header_id,
-            $this->subheader_id,
             $id
         ));
 
@@ -529,18 +583,34 @@ class content
         if ($this->step_description == "") {
             array_push($this->errors, "step_description");
         }
-        /*
+        /* - This is actually not mandatory
         if ($this->step_howto_description == "") {
             array_push($this->errors, "step_howto_description");
         }*/
         if ($this->step_url == "") {
             array_push($this->errors, "step_url");
         }
-        if ($this->header_id == "0") {
-            array_push($this->errors, "header");
+
+        if (!in_array("IMPORT", $this->trade_types) && !in_array("EXPORT", $this->trade_types)) {
+            array_push($this->errors, "trade_type");
         }
-        if ($this->subheader_id == "0") {
-            array_push($this->errors, "subheader");
+
+        if (in_array("IMPORT", $this->trade_types)) {
+            if ($this->header_id_import == "0") {
+                array_push($this->errors, "header_import");
+            }
+            if ($this->subheader_id_import == "0") {
+                array_push($this->errors, "subheader_import");
+            }
+        }
+
+        if (in_array("EXPORT", $this->trade_types)) {
+            if ($this->header_id_export == "0") {
+                array_push($this->errors, "header_export");
+            }
+            if ($this->subheader_id_export == "0") {
+                array_push($this->errors, "subheader_export");
+            }
         }
 
         if (count($this->errors) > 0) {
@@ -549,9 +619,12 @@ class content
             $_SESSION["step_description"] = $this->step_description;
             $_SESSION["step_howto_description"] = $this->step_howto_description;
             $_SESSION["step_url"] = $this->step_url;
-            $_SESSION["header_id"] = $this->header_id;
-            $_SESSION["subheader_id"] = $this->subheader_id;
+            $_SESSION["header_id_import"] = $this->header_id_import;
+            $_SESSION["subheader_id_import"] = $this->subheader_id_import;
+            $_SESSION["header_id_export"] = $this->header_id_export;
+            $_SESSION["subheader_id_export"] = $this->subheader_id_export;
             $_SESSION["country_exclusions"] = $this->country_exclusions;
+            $_SESSION["trade_types"] = $this->trade_types;
 
             $this->data .= serialize($this->errors);
             $this->data_encrypted = SA_Encryption::encrypt_to_url_param($this->data);
@@ -566,13 +639,28 @@ class content
     {
         global $conn, $app;
 
+
+        $this->trade_types = get_request("trade_type");
+        if (in_array("IMPORT", $this->trade_types)) {
+            $this->header_id_import = get_request("header_import");
+            $this->subheader_id_import = get_request("subheader_import");
+        } else {
+            $this->header_id_import = null;
+            $this->subheader_id_import = null;
+        }
+        if (in_array("EXPORT", $this->trade_types)) {
+            $this->header_id_export = get_request("header_export");
+            $this->subheader_id_export = get_request("subheader_export");
+        } else {
+            $this->header_id_export = null;
+            $this->subheader_id_export = null;
+        }
+
         $this->step_description = get_request("step_description");
         $this->step_howto_description = get_request("step_howto_description");
         $this->step_url = get_request("step_url");
-        $this->header_id = get_request("header");
-        $this->subheader_id = get_request("subheader");
         $this->country_exclusions = get_request("country_exclusions");
-        $this->parse_country_exclusions();
+        //$this->parse_country_exclusions();
 
         // Do the validation
         $this->validate();
@@ -581,26 +669,62 @@ class content
         $sid = get_request("sid");
 
         // Insert the step
+        /*
         $sql = "INSERT INTO signposting_steps
         (step_description, step_howto_description, step_url, header_id, subheader_id, date_created, user_id)
         VALUES ($1, $2, $3, $4, $5, current_timestamp, $6) RETURNING id;";
+        */
+        $sql = "INSERT INTO signposting_steps
+        (step_description, step_howto_description, step_url, date_created, user_id)
+        VALUES ($1, $2, $3, current_timestamp, $4) RETURNING id;";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         $result = pg_execute($conn, $command, array(
             $this->step_description,
             $this->step_howto_description,
             $this->step_url,
-            $this->header_id,
-            $this->subheader_id,
             $app->user_id
         ));
+
         // Get the ID back
         if (($result) && (pg_num_rows($result) > 0)) {
             $row = pg_fetch_row($result);
             $id = $row[0];
         }
 
+        // Insert the import header / subheader link
+        if (($this->header_id_import != "") && ($this->header_id_import != "")) {
+            $sql = "INSERT INTO signposting_step_heading_assignment
+            (signposting_step_id, trade_type, header_id, subheader_id, date_created)
+            VALUES ($1, $2, $3, $4, current_timestamp)";
+            $command = uniqid();
+            pg_prepare($conn, $command, $sql);
+            $result = pg_execute($conn, $command, array(
+                $id,
+                "IMPORT",
+                $this->header_id_import,
+                $this->subheader_id_import
+            ));
+        }
+
+
+        // Insert the export header / subheader link
+        if (($this->header_id_export != "") && ($this->header_id_export != "")) {
+            $sql = "INSERT INTO signposting_step_heading_assignment
+            (signposting_step_id, trade_type, header_id, subheader_id, date_created)
+            VALUES ($1, $2, $3, $4, current_timestamp)";
+            $command = uniqid();
+            pg_prepare($conn, $command, $sql);
+            $result = pg_execute($conn, $command, array(
+                $id,
+                "EXPORT",
+                $this->header_id_export,
+                $this->subheader_id_export
+            ));
+        }
+
         // Insert the country exclusions, if needed
+        /*
         if (count($this->country_exclusion_list) > 0) {
             foreach ($this->country_exclusion_list as  $country_code) {
                 $sql = "INSERT INTO signposting_step_country_exclusions
@@ -614,6 +738,8 @@ class content
                 ));
             }
         }
+        */
+
 
         // Then insert the links to entities if needed
         switch ($link_type) {

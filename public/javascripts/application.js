@@ -40,7 +40,7 @@ $(document).ready(function () {
     $("#export_header").hide();
     */
 
-    $("#header").on("change", function () {
+    $("#header_import").on("change", function () {
         var header_id = $(this).children("option:selected").val();
         url = "/api/subheaders.php?header_id=" + header_id;
         var data = getJson(url);
@@ -48,13 +48,37 @@ $(document).ready(function () {
         //console.log(results);
         if (results.length == 0) {
             // There are no valid suheaders
-            $("#subheader").val("Unspecified");
-            $("#subheader").prop("disabled", true);
+            $("#subheader_import").val("Unspecified");
+            $("#subheader_import").prop("disabled", true);
         } else {
-            $("#subheader").prop("disabled", false);
-            var options = $('#subheader').prop('options');
+            $("#subheader_import").prop("disabled", false);
+            var options = $('#subheader_import').prop('options');
             //console.log (options);
-            $("#subheader option[value!='0']").each(function () {
+            $("#subheader_import option[value!='0']").each(function () {
+                $(this).remove();
+            });
+            $.each(results, function () {
+                //console.log ("Here");
+                options[options.length] = new Option(this.description, this.id);
+            });
+        }
+    });
+
+    $("#header_export").on("change", function () {
+        var header_id = $(this).children("option:selected").val();
+        url = "/api/subheaders.php?header_id=" + header_id;
+        var data = getJson(url);
+        var results = data.results;
+        //console.log(results);
+        if (results.length == 0) {
+            // There are no valid suheaders
+            $("#subheader_export").val("Unspecified");
+            $("#subheader_export").prop("disabled", true);
+        } else {
+            $("#subheader_export").prop("disabled", false);
+            var options = $('#subheader_export').prop('options');
+            //console.log (options);
+            $("#subheader_export option[value!='0']").each(function () {
                 $(this).remove();
             });
             $.each(results, function () {

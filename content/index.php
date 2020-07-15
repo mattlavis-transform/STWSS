@@ -104,15 +104,15 @@ require("../includes/meta.php");
                             <?php
                             foreach ($app->content as $c) {
                             ?>
-                                <tr class="govuk-table__row">
+                                <tr id="row_<?= $c->id ?>" class="govuk-table__row">
                                     <td class="govuk-table__cell"><?= $c->id ?></td>
                                     <td class="govuk-table__cell">
                                         <b><?= $c->step_description ?></b><br />
                                         <?= $c->step_howto_description ?><br />
                                         <a target="_blank" rel="noopener noreferrer" href="<?= $c->step_url ?>"><?= $c->step_url ?></a><br /><br />
-                                        <em>Assigned to section / subsection:</em><br />
+                                        <!--<em>Assigned to section / subsection:</em><br />
                                         &gt; <?= $c->header_description ?><br />
-                                        &gt; <?= $c->subheader_description ?>
+                                        &gt; <?= $c->subheader_description ?>//-->
                                     </td>
                                     <td class="govuk-table__cell" style="width:30%">
                                         <?php
@@ -121,7 +121,8 @@ require("../includes/meta.php");
                                         } else {
                                             echo ('<ol class="govuk-list govuk-list--m govuk-list--number">');
                                             foreach ($c->linkage as $l) {
-                                                $remove_url = "/includes/routes.php?action=delete_content_linkage&src=content_index&link_type=section&sid=" . $l->id;
+                                                //pre ($l);
+                                                $remove_url = "/includes/routes.php?action=delete_content_linkage&src=content_index&link_type=" . $l->link_type . "&sid=" . $l->id. "&id=" . $c->id;
                                                 echo ("<li>");
                                                 echo ($l->entity_id . " - " . $l->description . "&nbsp;");
                                                 echo ("<a class='govuk-link' href='" . $remove_url . "'><i class='fas fa-trash-alt'></i></a>");

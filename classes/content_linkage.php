@@ -6,4 +6,5 @@ class content_linkage
     public $entity_id           = "";
     public $description           = "";
     public $priority            = "";
+    public $link_type            = "";
 }

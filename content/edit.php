@@ -1,9 +1,11 @@
 <?php
 require("../includes/db.php");
 $app = new application();
-$app->get_headers();
 $app->check_for_errors();
+
+$app->get_headers();
 $app->get_subheaders();
+
 $app->get_content_linking_methods();
 $app->get_trade_types();
 
@@ -75,49 +77,87 @@ require("../includes/meta.php");
                                 $content->step_description = get_session_variable("step_description");
                                 $content->step_howto_description = get_session_variable("step_howto_description");
                                 $content->step_url = get_session_variable("step_url");
-                                $content->header_id = get_session_variable("header_id");
-                                $content->subheader_id = get_session_variable("subheader_id");
+                                $content->header_id_import = get_session_variable("header_id_import");
+                                $content->subheader_id_import = get_session_variable("subheader_id_import");
+                                $content->header_id_export = get_session_variable("header_id_export");
+                                $content->subheader_id_export = get_session_variable("subheader_id_export");
                                 $content->country_exclusions = get_session_variable("country_exclusions");
                             }
                             new textarea("step_description", "Step title", "This is the content which will be displayed in the step's hyperlink", false, 3, $content->step_description);
                             new textarea("step_howto_description", "Explanatory text", "Optionally, add some explanatory text to advise users further", false, 2, $content->step_howto_description);
                             new textarea("step_url", "URL", "Please enter the full URL including the https://", false, 2, $content->step_url);
 
+
+
+                            if (in_array("trade_type", $app->error_array)) {
+                                $error_class = " govuk-form-group--error";
+                                $msg = $app->get_error_message("trade_type");
+                            } else {
+                                $error_class = "";
+                                $msg = "";
+                            }
                                 ?>
 
 
-                                <div class="govuk-form-group">
-                                    <fieldset class="govuk-fieldset" aria-describedby="trade_type-conditional-hint">
+                                <div class="govuk-form-group  <?= $error_class ?>">
+                                    <fieldset class="govuk-fieldset" aria-describedby="trade_type-import-hint">
                                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                                             <h1 class="govuk-fieldset__heading">
                                                 Select a trade type </h1>
                                         </legend>
-                                        <span id="trade_type-conditional-hint" class="govuk-hint">
-                                            Identify if this content is to apply to import trade, export trade or both. If you do not explicitly link the step to any other entities, then the step will apply to the specified trade type(s) under all circumstances. You must select at least one of these options.
+                                        <span id="trade_type-import-hint" class="govuk-hint">
+                                            Identify if this content is to apply to import trade, export trade or both.
+                                            If you do not explicitly link the step to any other entities, then the step will apply
+                                            to the specified trade type(s) under all circumstances.<br /><br />
+                                            You must select at least one of these options.
                                         </span>
+
+                                        <?php
+                                        $import_checked = "";
+                                        $export_checked = "";
+                                        if (get_querystring("err") == 1) {
+                                            $trade_types = $_SESSION["trade_types"];
+                                        } else {
+                                            $trade_types = $content->trade_types;
+                                        }
+                                        if (in_array("IMPORT", $trade_types)) {
+                                            $import_checked = " checked";
+                                        }
+                                        if (in_array("EXPORT", $trade_types)) {
+                                            $export_checked = " checked";
+                                        }
+
+                                        if ($msg != "") {
+                                        ?>
+                                            <span class="govuk-error-message">
+                                                <span class="govuk-visually-hidden">Error:</span> <?= $msg ?>
+                                            </span>
+                                        <?php
+                                        }
+                                        ?>
                                         <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                             <div class="govuk-checkboxes__item">
-                                                <input class="govuk-checkboxes__input" id="trade_type-conditional" name="trade_type" type="checkbox" value="email" data-aria-controls="conditional-trade_type-conditional">
-                                                <label class="govuk-label govuk-checkboxes__label" for="trade_type-conditional">
+                                                <input <?= $import_checked ?> class="govuk-checkboxes__input" id="trade_type-import" name="trade_type[]" type="checkbox" value="IMPORT" data-aria-controls="conditional-trade_type-import">
+                                                <label class="govuk-label govuk-checkboxes__label" for="trade_type-import">
                                                     Import
                                                 </label>
                                             </div>
-                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-trade_type-conditional">
+                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-trade_type-import">
                                                 <?php
-                                                new select("header_import", $app->headers, "Select the import heading", "", false, $content->header_id, "");
-                                                new select("subheader_import", $app->subheaders, "Select the import subheading", "", false, $content->subheader_id, "");
+                                                new select("header_import", $app->headers_import, "Select the import heading", "", false, $content->header_id_import, "");
+                                                new select("subheader_import", $app->subheaders_import, "Select the import subheading", "", false, $content->subheader_id_import, "");
                                                 ?>
                                             </div>
                                             <div class="govuk-checkboxes__item">
-                                                <input class="govuk-checkboxes__input" id="trade_type-conditional-2" name="trade_type" type="checkbox" value="phone" data-aria-controls="conditional-trade_type-conditional-2">
-                                                <label class="govuk-label govuk-checkboxes__label" for="trade_type-conditional-2">
+                                                <input <?= $export_checked ?> class="govuk-checkboxes__input" id="trade_type-export" name="trade_type[]" type="checkbox" value="EXPORT" data-aria-controls="conditional-trade_type-export">
+                                                <label class="govuk-label govuk-checkboxes__label" for="trade_type-export">
                                                     Export
                                                 </label>
                                             </div>
-                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-trade_type-conditional-2">
+                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-trade_type-export">
                                                 <?php
-                                                new select("header_import", $app->headers, "Select the import heading", "", false, $content->header_id, "");
-                                                new select("subheader_import", $app->subheaders, "Select the import subheading", "", false, $content->subheader_id, "");
+                                                new select("header_export", $app->headers_export, "Select the export heading", "", false, $content->header_id_export, "");
+                                                new select("subheader_export", $app->subheaders_export, "Select the export subheading", "", false, $content->subheader_id_export, "");
                                                 ?>
                                             </div>
                                         </div>
@@ -152,7 +192,6 @@ require("../includes/meta.php");
                                     $content->get_linkages("commodity");
                                     $content->get_linkages("measure_type");
                                     $content->get_linkages("document_code");
-                                    $content->get_linkages("trade_type");
                                     ?>
                                 </div>
                             <?php
