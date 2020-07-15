@@ -134,6 +134,7 @@ class content
         $c->step1 = "<a class='govuk-link' href='/content/link_01.html?id=" . $id . "'>Link this content again</a>";
         $c->step2 = "<a class='govuk-link' href='/content/edit.html?id=" . $id . "#linkage'>View this content item</a>";
         $c->step3 = "<a class='govuk-link' href='/content'>View all content</a>";
+        $c->step4 = "";
         $c->encrypt_data();
         $url = "/includes/confirm.html?data=" . $c->data_encrypted;
         header("Location: " . $url);
@@ -877,6 +878,7 @@ class content
         $c->step1 = "<a class='govuk-link' href='/content/link_01.html?id=" . $this->id . "'>Link to this content</a>";
         $c->step2 = "<a class='govuk-link' href='/content/edit.html?id=" . $this->id . "'>View this content item</a>";
         $c->step3 = "<a class='govuk-link' href='/content'>View all content</a>";
+        $c->step4 = "<a class='govuk-link' href='/content/edit.html'>Create more content</a>";
         $c->encrypt_data();
         $url = "/includes/confirm.html?data=" . $c->data_encrypted;
         header("Location: " . $url);

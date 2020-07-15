@@ -41,6 +41,7 @@ require("../includes/meta.php");
                     <p class="govuk-body"><?= $c->step1 ?></p>
                     <p class="govuk-body"><?= $c->step2 ?></p>
                     <p class="govuk-body"><?= $c->step3 ?></p>
+                    <p class="govuk-body"><?= $c->step4 ?></p>
                     
                 </div>
             </div>

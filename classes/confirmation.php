@@ -11,6 +11,7 @@ class confirmation
     public $step1 = "";
     public $step2 = "";
     public $step3 = "";
+    public $step4 = "";
 
     function __construct()
     {
@@ -27,6 +28,7 @@ class confirmation
         $this->step1 = $this->data_array[2];
         $this->step2 = $this->data_array[3];
         $this->step3 = $this->data_array[4];
+        $this->step4 = $this->data_array[5];
 
     }
 
@@ -38,6 +40,7 @@ class confirmation
         $this->data .= $this->step1 . $app->delimiter;
         $this->data .= $this->step2 . $app->delimiter;
         $this->data .= $this->step3 . $app->delimiter;
+        $this->data .= $this->step4 . $app->delimiter;
         $this->data_encrypted = SA_Encryption::encrypt_to_url_param($this->data);
     }
 }
