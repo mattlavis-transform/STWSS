@@ -496,6 +496,10 @@ class application
         select ssdca.id, signposting_step_id, 'Document code ' || c.code as entity_id, 5 as priority, c.description, 'document_code' as link_type
         from signposting_step_document_code_assignment ssdca, certificates c
         where ssdca.document_code = c.code
+        union
+        select ssca.id, ssca.signposting_step_id, 'Commodity ' || gn.goods_nomenclature_item_id as entity_id, 6 as priority, gn.description, 'commodity' as link_type
+        from signposting_step_commodity_assignment ssca, goods_nomenclatures gn 
+        where gn.goods_nomenclature_sid = ssca.goods_nomenclature_sid 
         )
         select * from cte where signposting_step_id in (" . $records . ") order by priority, id";
         $result = pg_query($conn, $sql);

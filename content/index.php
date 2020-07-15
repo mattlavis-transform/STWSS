@@ -120,7 +120,7 @@ require("../includes/meta.php");
                                         &gt; <?= $c->subheader_description ?>//-->
                                     </td>
                                     <td class="govuk-table__cell" style="min-width:30%">
-                                    <?php
+                                        <?php
                                         if (count($c->trade_types) == 0) {
                                             echo ("Not linked to any database entities");
                                         } else {
@@ -144,11 +144,15 @@ require("../includes/meta.php");
                                         } else {
                                             echo ('<ul class="govuk-list govuk-list--m govuk-list--bullet">');
                                             foreach ($c->linkage as $l) {
-                                                //pre ($l);
                                                 $remove_url = "/includes/routes.php?action=delete_content_linkage&src=content_index&link_type=" . $l->link_type . "&sid=" . $l->id . "&id=" . $c->id;
                                                 echo ("<li>");
-                                                echo ($l->entity_id . " - " . $l->description . "&nbsp;");
-                                                echo ("<a class='govuk-link' href='" . $remove_url . "'><i class='fas fa-trash-alt'></i></a>");
+                                                if ($l->link_type == "commodity") {
+                                                    echo ("<abbr title='" . $l->description . "'>" . $l->entity_id . "</a>&nbsp;");
+                                                    echo ("<a class='govuk-link' href='" . $remove_url . "'><i class='fas fa-trash-alt'></i></a>");
+                                                    } else {
+                                                    echo ($l->entity_id . " - " . $l->description . "&nbsp;");
+                                                    echo ("<a class='govuk-link' href='" . $remove_url . "'><i class='fas fa-trash-alt'></i></a>");
+                                                }
                                                 echo ("</li>");
                                             }
                                             echo ("</ul>");

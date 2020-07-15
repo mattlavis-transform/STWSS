@@ -300,9 +300,9 @@ class content
                 $this->id, $commodity->goods_nomenclature_sid
             ));
 
-            h1("found");
         } else {
             h1("not found");
+            die();
         };
         $this->unblanket();
     }
