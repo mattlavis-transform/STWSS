@@ -479,6 +479,46 @@ class content
         echo ("<p><a class='govuk-link' href='" . $link_url . "'>Link content to " . str_replace("_", " ", $link_type) . "</a></p>");
     }
 
+    function check_for_links()
+    {
+        global $conn;
+
+        $sql = "with cte as (
+        select sssa.id, signposting_step_id, 'Section ' || s.numeral as entity_id, 1 as priority, s.title as description, 'section' as link_type
+        from signposting_step_section_assignment sssa, sections s
+        where sssa.section_id = s.id 
+        union
+        select ssca.id, signposting_step_id, 'Chapter ' || c.id as entity_id, 2 as priority, c.description, 'chapter' as link_type
+        from signposting_step_chapter_assignment ssca, chapters c
+        where ssca.chapter_id = cast(c.id as int)
+        union
+        select ssmta.id, signposting_step_id, 'Measure type ' || mt.measure_type_id as entity_id, 4 as priority, mt.description, 'measure_type' as link_type
+        from signposting_step_measure_type_assignment ssmta, measure_types mt
+        where ssmta.measure_type_id = mt.measure_type_id 
+        union
+        select ssdca.id, signposting_step_id, 'Document code ' || c.code as entity_id, 5 as priority, c.description, 'document_code' as link_type
+        from signposting_step_document_code_assignment ssdca, certificates c
+        where ssdca.document_code = c.code
+        )
+        select count(*) as total_count from cte where cte.signposting_step_id = $1";
+
+        $stmt = uniqid();
+        pg_prepare($conn, $stmt, $sql);
+        $result = pg_execute($conn, $stmt, array($this->id));
+
+        $row_count = pg_num_rows($result);
+        $total_count = 0;
+        if (($result) && ($row_count > 0)) {
+            $row = pg_fetch_array($result);
+            $total_count = $row["total_count"];
+        }
+        if ($total_count > 0) {
+            return (true);
+        } else {
+            return (false);
+        }
+    }
+
     function update()
     {
         global $conn;
@@ -509,7 +549,7 @@ class content
         $this->validate();
 
         $link_type = get_request("link_type");
-        $id = get_request("id");
+        $this->id = get_request("id");
 
         // Save the existing data to an audit table
         $sql = "insert into signposting_steps_history
@@ -517,10 +557,10 @@ class content
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         $result = pg_execute($conn, $command, array(
-            $id
+            $this->id
         ));
 
-        // Insert the step
+        // Update the step
         $sql = "UPDATE signposting_steps SET
         step_description = $1,
         step_howto_description = $2,
@@ -533,14 +573,61 @@ class content
             $this->step_description,
             $this->step_howto_description,
             $this->step_url,
-            $id
+            $this->id
         ));
+
+        // Delete existing headers, trade type links etc.
+        $sql = "DELETE FROM signposting_step_trade_type_assignment
+        WHERE signposting_step_id = $1";
+        $command = uniqid();
+        pg_prepare($conn, $command, $sql);
+        $result = pg_execute($conn, $command, array(
+            $this->id
+        ));
+
+        if ($this->check_for_links()) {
+            $blanket_apply = null;
+        } else {
+            $blanket_apply = true;
+        }
+
+        // Insert the import header / subheader link
+        if (($this->header_id_import != "") && ($this->subheader_id_import != "")) {
+            $sql = "INSERT INTO signposting_step_heading_assignment
+            (signposting_step_id, trade_type, header_id, subheader_id, date_created)
+            VALUES ($1, $2, $3, $4, current_timestamp)";
+            $command = uniqid();
+            pg_prepare($conn, $command, $sql);
+            $result = pg_execute($conn, $command, array(
+                $this->id,
+                "IMPORT",
+                $this->header_id_import,
+                $this->subheader_id_import
+            ));
+            $this->assign_trade_type("IMPORT", $blanket_apply);
+        }
+
+        // Insert the export header / subheader link
+        if (($this->header_id_export != "") && ($this->subheader_id_export != "")) {
+            $sql = "INSERT INTO signposting_step_heading_assignment
+            (signposting_step_id, trade_type, header_id, subheader_id, date_created)
+            VALUES ($1, $2, $3, $4, current_timestamp)";
+            $command = uniqid();
+            pg_prepare($conn, $command, $sql);
+            $result = pg_execute($conn, $command, array(
+                $this->id,
+                "EXPORT",
+                $this->header_id_export,
+                $this->subheader_id_export
+            ));
+            $this->assign_trade_type("EXPORT", $blanket_apply);
+        }
 
         // Then redirect to the confirmation page
         $c = new confirmation();
-        $c->panel_title = "Content item " . $id . " has been successfully updated";
+        $c->panel_title = "Content item " . $this->id . " has been successfully updated";
         $c->panel_body = "";
-        $c->step1 = "<a class='govuk-link' href='/content/edit.html?id=" . $id . "'>View this content item</a>";
+        $c->step1 = "<a class='govuk-link' href='/content/edit.html?id=" . $this->id . "'>View this content item</a>";
         $c->step2 = "<a class='govuk-link' href='/content'>View all content</a>";
         $c->encrypt_data();
         $url = "/includes/confirm.html?data=" . $c->data_encrypted;
@@ -630,7 +717,6 @@ class content
         $this->step_howto_description = get_request("step_howto_description");
         $this->step_url = get_request("step_url");
         $this->country_exclusions = get_request("country_exclusions");
-        //$this->parse_country_exclusions();
 
         // Do the validation
         $this->validate();
@@ -639,11 +725,6 @@ class content
         $sid = get_request("sid");
 
         // Insert the step
-        /*
-        $sql = "INSERT INTO signposting_steps
-        (step_description, step_howto_description, step_url, header_id, subheader_id, date_created, user_id)
-        VALUES ($1, $2, $3, $4, $5, current_timestamp, $6) RETURNING id;";
-        */
         $sql = "INSERT INTO signposting_steps
         (step_description, step_howto_description, step_url, date_created, user_id)
         VALUES ($1, $2, $3, current_timestamp, $4) RETURNING id;";
@@ -817,7 +898,8 @@ class content
         ));
     }
 
-    function unblanket() {
+    function unblanket()
+    {
         global $conn;
         // Called when the content item is updated to link to any reference data
         $sql = "UPDATE signposting_step_trade_type_assignment
