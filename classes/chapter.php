@@ -3,6 +3,7 @@ class chapter
 {
     // Class properties and methods go here
     public $id                          = "";
+    public $section_id                  = "";
     public $title                       = "";
     public $description                 = "";
     public $notes                       = "";

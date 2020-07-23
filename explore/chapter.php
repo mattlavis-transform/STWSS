@@ -20,7 +20,7 @@ require("../includes/meta.php");
     ?>
     <div class="govuk-width-container ">
         <?php
-        $app->crumb_string = "Home|/;Explore the trade tariff|";
+        $app->crumb_string = "Home|/;Explore the trade tariff|/explore;Section " . integerToRoman($app->chapter->section_id) . "|/explore/section.html?id=" . $app->chapter->section_id . ";Chapter " . $app->chapter->id . "|";
         require("../includes/crumb.php");
         ?>
         <main class="govuk-main-wrapper govuk-main-wrapper--auto-spacing" id="main-content" role="main">

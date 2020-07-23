@@ -45,7 +45,7 @@ require("./includes/meta.php");
                 </div>
                 <div class="govuk-grid-column-one-third">
                     <h2 class="govuk-heading-m">Tariff data exploration</h2>
-                    <p class="govuk-body"><a href="/explore">Explore tariff</a></p>
+                    <p class="govuk-body"><a href="/explore">Explore the trade tariff</a></p>
                 </div>
             </div>
         </main>

@@ -22,7 +22,7 @@ require("../includes/meta.php");
     ?>
     <div class="govuk-width-container ">
         <?php
-        $app->crumb_string = "Home|/;Explore the trade tariff|";
+        $app->crumb_string = "Home|/;Explore the trade tariff|/explore;Section " . $app->section->numeral . "|";
         require("../includes/crumb.php");
         ?>
         <main class="govuk-main-wrapper govuk-main-wrapper--auto-spacing" id="main-content" role="main">

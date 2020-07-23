@@ -53,7 +53,7 @@ class application
     public $record_count = 0;
     public $content_records = array();
     public $measure_type_ranges = array();
-    
+
     public $import_measure_permutations = array();
     public $export_measure_permutations = array();
 
@@ -79,7 +79,8 @@ class application
         $this->setup_measure_type_ranges();
     }
 
-    public function setup_measure_type_ranges() {
+    public function setup_measure_type_ranges()
+    {
         $this->measure_type_ranges = array();
         array_push($this->measure_type_ranges, new measure_type_range("400", "479"));
         array_push($this->measure_type_ranges, new measure_type_range("700", "999"));
@@ -89,7 +90,7 @@ class application
         array_push($this->measure_type_ranges, new measure_type_range("EQC", "EWP"));
         array_push($this->measure_type_ranges, new measure_type_range("HAA", "IZZ"));
         array_push($this->measure_type_ranges, new measure_type_range("PHC", "UZZ"));
-        
+
         //pre ($this->measure_type_ranges);
     }
 
@@ -292,13 +293,24 @@ class application
         // Get chapter details
         if (isset($this->json["data"])) {
             $data = $this->json["data"];
+            //pre($data);
             $this->chapter = new chapter();
             $this->chapter->id = $data["id"];
             $this->chapter->goods_nomenclature_sid = $data["attributes"]["goods_nomenclature_sid"];
             $this->chapter->goods_nomenclature_item_id = $data["attributes"]["goods_nomenclature_item_id"];
             $this->chapter->description = $data["attributes"]["formatted_description"];
             $this->chapter->id = substr($this->chapter->goods_nomenclature_item_id, 0, 2);
+
+            // Get the section
+            if (isset($data["relationships"])) {
+                $relationships = $data["relationships"];
+                if (isset($relationships["section"])) {
+                    $this->chapter->section_id = $relationships["section"]["data"]["id"];
+                }
+                //pre($relationships);
+            }
         }
+
 
         //die();
 
@@ -340,6 +352,16 @@ class application
             $this->heading->goods_nomenclature_item_id = $data["attributes"]["goods_nomenclature_item_id"];
             $this->heading->description = $data["attributes"]["formatted_description"];
             $this->heading->id = substr($this->heading->goods_nomenclature_item_id, 0, 4);
+
+            // Get the section
+            if (isset($data["relationships"])) {
+                $relationships = $data["relationships"];
+                if (isset($relationships["section"])) {
+                    $this->heading->section_id = $relationships["section"]["data"]["id"];
+                }
+                //pre($relationships);
+            }
+
         }
         //die();
 
