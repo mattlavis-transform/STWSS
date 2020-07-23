@@ -9,6 +9,7 @@ require(dirname(__FILE__) . "../../classes/measure.php");
 require(dirname(__FILE__) . "../../classes/reusable.php");
 require(dirname(__FILE__) . "../../classes/section.php");
 require(dirname(__FILE__) . "../../classes/chapter.php");
+require(dirname(__FILE__) . "../../classes/heading.php");
 require(dirname(__FILE__) . "../../classes/content.php");
 require(dirname(__FILE__) . "../../classes/content_linkage.php");
 require(dirname(__FILE__) . "../../classes/header.php");
@@ -18,6 +19,7 @@ require(dirname(__FILE__) . "../../classes/encrypt.php");
 require(dirname(__FILE__) . "../../classes/confirmation.php");
 require(dirname(__FILE__) . "../../classes/measure_type.php");
 require(dirname(__FILE__) . "../../classes/document_code.php");
+require(dirname(__FILE__) . "../../classes/measure_type_range.php");
 
 // Components
 require(dirname(__FILE__) . "../../components/hidden.php");
@@ -704,7 +706,7 @@ function format_goods_nomenclature_item_id($s, $size_class = "")
             $s2 = "<span class='rpad mauve " . $size_class . "'>" . substr($s, 0, 4) . "</span><span class='rpad blue " . $size_class . "'>" . substr($s, 4, 2) . "</span>";
             break;
         case 4:
-            $s2 = "<span class='rpad mauve " . $size_class . "'>" . substr($s, 0, 4) . "</span>";
+            $s2 = "<span class='rpad mauve " . $size_class . "'>" . substr($s, 0, 2) . "</span><span class='rpad mauve " . $size_class . "'>" . substr($s, 2, 2) . "</span>";
             break;
         case 2:
             $s2 = "<span class='rpad mauve " . $size_class . "'>" . substr($s, 0, 2) . "</span>";

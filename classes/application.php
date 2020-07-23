@@ -14,6 +14,7 @@ class application
     public $certificates_to_document_codes = array();
     public $sections = array();
     public $chapters = array();
+    public $headings = array();
     public $measure_types = array();
     public $document_codes = array();
     public $section_content = array();
@@ -44,11 +45,15 @@ class application
     public $user_name = null;
     public $first_name = null;
     public $last_name = null;
+    public $chapter = null;
+    public $section = null;
 
     public $page_size = 10;
     public $page = 1;
     public $record_count = 0;
     public $content_records = array();
+    public $measure_type_ranges = array();
+    
 
     function __construct()
     {
@@ -69,6 +74,21 @@ class application
             session_start();
         }
         $this->check_permissions();
+        $this->setup_measure_type_ranges();
+    }
+
+    public function setup_measure_type_ranges() {
+        $this->measure_type_ranges = array();
+        array_push($this->measure_type_ranges, new measure_type_range("400", "479"));
+        array_push($this->measure_type_ranges, new measure_type_range("700", "999"));
+        array_push($this->measure_type_ranges, new measure_type_range("AAA", "CZZ"));
+        array_push($this->measure_type_ranges, new measure_type_range("ECM", "ECM"));
+        array_push($this->measure_type_ranges, new measure_type_range("EHC", "EHC"));
+        array_push($this->measure_type_ranges, new measure_type_range("EQC", "EWP"));
+        array_push($this->measure_type_ranges, new measure_type_range("HAA", "IZZ"));
+        array_push($this->measure_type_ranges, new measure_type_range("PHC", "UZZ"));
+        
+        //pre ($this->measure_type_ranges);
     }
 
     public function check_permissions()
@@ -185,6 +205,160 @@ class application
             }
         }
         $this->get_section_content();
+    }
+
+    public function get_sections_from_API()
+    {
+        $url = "https://www.trade-tariff.service.gov.uk/api/v2/sections/";
+        $this->curl = curl_init();
+        curl_setopt($this->curl, CURLOPT_URL, $url);
+        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($this->curl);
+        $this->json = json_decode($output, true);
+
+        if (isset($this->json["data"])) {
+            $data = $this->json["data"];
+            $this->sections = array();
+            foreach ($data as $item) {
+                $obj = new section;
+                $obj->id = $item["attributes"]["id"];
+                $obj->numeral = $item["attributes"]["numeral"];
+                $obj->description = $item["attributes"]["title"];
+                $obj->position = $item["attributes"]["position"];
+                $obj->chapter_from = $item["attributes"]["chapter_from"];
+                $obj->chapter_to = $item["attributes"]["chapter_to"];
+
+                //pre ($obj);
+                array_push($this->sections, $obj);
+            }
+        }
+    }
+
+    public function get_chapters_from_API()
+    {
+        $section_id = get_querystring("id");
+        $url = "https://www.trade-tariff.service.gov.uk/api/v2/sections/" . $section_id;
+        $this->curl = curl_init();
+        curl_setopt($this->curl, CURLOPT_URL, $url);
+        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($this->curl);
+        $this->json = json_decode($output, true);
+
+        // Get section details
+        if (isset($this->json["data"])) {
+            $data = $this->json["data"];
+            $this->section = new section();
+            $this->section->id = $data["id"];
+            $this->section->numeral = $data["attributes"]["numeral"];
+            $this->section->description = $data["attributes"]["title"];
+        }
+
+        // Get subsidiary chapter details
+        if (isset($this->json["included"])) {
+            $included = $this->json["included"];
+            //prend($included);
+            $this->chapters = array();
+            foreach ($included as $item) {
+                $type =  $item["type"];
+                if ($type == "chapter") {
+                    $chapter = new chapter;
+
+                    $chapter->goods_nomenclature_sid = $item["attributes"]["goods_nomenclature_sid"];
+                    $chapter->goods_nomenclature_item_id = $item["attributes"]["goods_nomenclature_item_id"];
+                    $chapter->description = $item["attributes"]["formatted_description"];
+                    $chapter->id = substr($chapter->goods_nomenclature_item_id, 0, 2);
+
+                    array_push($this->chapters, $chapter);
+                }
+            }
+        }
+        //die();
+    }
+
+    public function get_headings_from_API()
+    {
+        $section_id = get_querystring("id");
+        $url = "https://www.trade-tariff.service.gov.uk/api/v2/chapters/" . $section_id;
+        $this->curl = curl_init();
+        curl_setopt($this->curl, CURLOPT_URL, $url);
+        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($this->curl);
+        $this->json = json_decode($output, true);
+
+        //prend ($this->json);
+
+        // Get chapter details
+        if (isset($this->json["data"])) {
+            $data = $this->json["data"];
+            $this->chapter = new chapter();
+            $this->chapter->id = $data["id"];
+            $this->chapter->goods_nomenclature_sid = $data["attributes"]["goods_nomenclature_sid"];
+            $this->chapter->goods_nomenclature_item_id = $data["attributes"]["goods_nomenclature_item_id"];
+            $this->chapter->description = $data["attributes"]["formatted_description"];
+            $this->chapter->id = substr($this->chapter->goods_nomenclature_item_id, 0, 2);
+        }
+
+        //die();
+
+        // Get subsidiary heading details
+        if (isset($this->json["included"])) {
+            $included = $this->json["included"];
+            $this->headings = array();
+            foreach ($included as $item) {
+                $type =  $item["type"];
+                if ($type == "heading") {
+                    $heading = new heading();
+                    $heading->goods_nomenclature_sid = $item["attributes"]["goods_nomenclature_sid"];
+                    $heading->goods_nomenclature_item_id = $item["attributes"]["goods_nomenclature_item_id"];
+                    $heading->description = $item["attributes"]["formatted_description"];
+                    $heading->id = substr($heading->goods_nomenclature_item_id, 0, 4);
+                    array_push($this->headings, $heading);
+                }
+            }
+        }
+    }
+
+    public function get_commodities_from_API()
+    {
+        $heading_id = get_querystring("id");
+        $url = "https://www.trade-tariff.service.gov.uk/api/v2/headings/" . $heading_id;
+        $this->curl = curl_init();
+        curl_setopt($this->curl, CURLOPT_URL, $url);
+        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($this->curl);
+        $this->json = json_decode($output, true);
+
+        // Get chapter details
+        if (isset($this->json["data"])) {
+            $data = $this->json["data"];
+            //prend ($data);
+
+            $this->heading = new heading();
+            $this->heading->goods_nomenclature_sid = $data["id"];
+            $this->heading->goods_nomenclature_item_id = $data["attributes"]["goods_nomenclature_item_id"];
+            $this->heading->description = $data["attributes"]["formatted_description"];
+            $this->heading->id = substr($this->heading->goods_nomenclature_item_id, 0, 4);
+        }
+        //die();
+
+        // Get subsidiary heading details
+        if (isset($this->json["included"])) {
+            $included = $this->json["included"];
+            $this->commodities = array();
+            foreach ($included as $item) {
+                $type =  $item["type"];
+                if ($type == "commodity") {
+                    $commodity = new commodity();
+                    $commodity->goods_nomenclature_sid = $item["attributes"]["goods_nomenclature_sid"];
+                    $commodity->goods_nomenclature_item_id = $item["attributes"]["goods_nomenclature_item_id"];
+                    $commodity->productline_suffix = $item["attributes"]["producline_suffix"];
+                    $commodity->number_indents = $item["attributes"]["number_indents"];
+                    $commodity->description = $item["attributes"]["formatted_description"];
+                    $commodity->declarable = $item["attributes"]["leaf"];
+                    array_push($this->commodities, $commodity);
+                }
+            }
+        }
     }
 
     public function get_chapters()
@@ -477,9 +651,9 @@ class application
     public function get_content_linkage()
     {
         global $conn;
-        
+
         $records = application::array_to_list($this->content_records);
-        
+
         $sql = "with cte as (
         select sssa.id, signposting_step_id, 'Section ' || s.numeral as entity_id, 1 as priority, s.title as description, 'section' as link_type
         from signposting_step_section_assignment sssa, sections s
@@ -532,9 +706,9 @@ class application
     public function get_content_trade_types_headings()
     {
         global $conn;
-        
+
         $records = application::array_to_list($this->content_records);
-        
+
         $sql = "with cte as (
         select ssha.id, signposting_step_id, ssha.trade_type, ssha.header_id, ssha.subheader_id,
         ssh.header_description, sss.subheader_description, ssh.order_index as o1, sss.order_index as o2
@@ -640,12 +814,13 @@ class application
         }
     }
 
-    static public function truncate($text, $chars = 120) {
-        if(strlen($text) > $chars) {
-            $text = $text.' ';
+    static public function truncate($text, $chars = 120)
+    {
+        if (strlen($text) > $chars) {
+            $text = $text . ' ';
             $text = substr($text, 0, $chars);
             //$text = substr($text, 0, strrpos($text ,' '));
-            $text = $text.'...';
+            $text = $text . '...';
         }
         //h1 ($text);
         return ($text);

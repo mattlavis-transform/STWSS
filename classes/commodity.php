@@ -13,6 +13,8 @@ class commodity
     public $hierarchy_string = "";
     public $import_measures = array();
     public $export_measures = array();
+    public $measures = array();
+    public $measure_conditions = array();
     public $content = array();
     public $is_heading = null;
     public $commodity_type = null;
@@ -147,7 +149,6 @@ class commodity
                             $sid = $item["attributes"]["parent_sid"];
                             $found = true;
                             if ($sid != $this->goods_nomenclature_sid) {
-
                                 $h = new hierarchy();
                                 $h->goods_nomenclature_item_id = $item["attributes"]["goods_nomenclature_item_id"];
                                 $h->productline_suffix = $item["attributes"]["producline_suffix"];
@@ -337,6 +338,51 @@ class commodity
                 $content->subheader_description = $row['subheader_description'];
                 */
                 array_push($this->content, $content);
+            }
+        }
+    }
+
+    public function cleansed_description() {
+        $array = array(",", '"', "'", "\n");
+        $s = $this->description;
+        foreach ($array as $item) {
+            $s = str_replace($item, "", $s);
+        }
+        return ($s);
+    }
+
+    public function get_measures()
+    {
+        //h1 ($this->goods_nomenclature_item_id);
+        //$this->goods_nomenclature_item_id = "1006101000";
+        //h1 ($this->goods_nomenclature_item_id);
+        $url = "https://www.trade-tariff.service.gov.uk/api/v2/commodities/" . $this->goods_nomenclature_item_id;
+        $this->curl = curl_init();
+        curl_setopt($this->curl, CURLOPT_URL, $url);
+        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($this->curl);
+        $this->json = json_decode($output, true);
+        //prend ($this->json);
+        if (isset($this->json["data"])) {
+            $data = $this->json["data"];
+        }
+        if (isset($this->json["included"])) {
+            $included = $this->json["included"];
+            $this->measures = array();
+            foreach ($included as $item) {
+                $type =  $item["type"];
+                if ($type == "measure") {
+                    $measure = new measure();
+                    $measure->measure_type_id   = $item["relationships"]["measure_type"]["data"]["id"];
+                    if ($measure->valid_measure_type()) {
+                        $measure->measure_sid       = $item["attributes"]["id"];
+                        $measure->import            = $item["attributes"]["import"];
+                        $measure->excise            = $item["attributes"]["excise"];
+                        $measure->vat               = $item["attributes"]["vat"];
+
+                        array_push($this->measures, $measure);
+                    }
+                }
             }
         }
     }
