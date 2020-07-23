@@ -23,7 +23,7 @@ class commodity
     public $measure_string = null;
     public $measure_string_import = null;
     public $measure_string_export = null;
-    
+
     public $measure_array_import = array();
     public $measure_array_export = array();
 
@@ -355,6 +355,7 @@ class commodity
         foreach ($array as $item) {
             $s = str_replace($item, "", $s);
         }
+        $s = str_replace("&nbsp;", " ", $s);
         return ($s);
     }
 
@@ -364,12 +365,26 @@ class commodity
         //$this->goods_nomenclature_item_id = "1006101000";
         //h1 ($this->goods_nomenclature_item_id);
         global $app;
+
+
         $url = "https://www.trade-tariff.service.gov.uk/api/v2/commodities/" . $this->goods_nomenclature_item_id;
         $this->curl = curl_init();
         curl_setopt($this->curl, CURLOPT_URL, $url);
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($this->curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
         $output = curl_exec($this->curl);
         $this->json = json_decode($output, true);
+        /*
+        if(curl_errno($this->curl)){
+            echo 'Curl error: ' . curl_error($this->curl);
+        }
+        */
+        /*
+        if ($this->goods_nomenclature_item_id == "1006309822") {
+            pre ($url);
+            prend($this->json);
+        }
+        */
         if (isset($this->json["data"])) {
             $data = $this->json["data"];
         }
@@ -393,6 +408,32 @@ class commodity
 
                         array_push($this->measures, $measure);
                     }
+                    if (isset($item["relationships"]["measure_conditions"])) {
+                        $conditions = $item["relationships"]["measure_conditions"]["data"];
+                        //h1 ("Found measure conditions " . count($conditions));
+                        //pre ($conditions);
+                        foreach ($conditions as $condition) {
+                            $mc = new measure_condition();
+                            $mc->measure_condition_sid  = $condition["id"];
+                            $mc->measure_sid            = $measure->measure_sid;
+                            array_push($measure->measure_conditions, $mc);
+                        }
+                    } else {
+                        //h1 ("Not found measure conditions");
+                    }
+                } elseif ($type == "measure_condition") {
+                    //h1("Found included condition " . $item["attributes"]["document_code"]);
+                    if ($item["attributes"]["document_code"] != "") {
+                        foreach ($this->measures as $measure) {
+                            foreach ($measure->measure_conditions as $mc) {
+                                //pre($mc->measure_condition_sid);
+                                if ($mc->measure_condition_sid == $item["id"]) {
+                                    array_push($measure->document_codes, $item["attributes"]["document_code"]);
+                                }
+                            }
+                        }
+                    }
+                    //prend($item);
                 }
             }
 
@@ -413,7 +454,7 @@ class commodity
             }
             $this->measure_string_import = rtrim($this->measure_string_import, ",");
             $this->measure_string_export = rtrim($this->measure_string_export, ",");
-
         }
+        //$this->get_measure_conditions();
     }
 }

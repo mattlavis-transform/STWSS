@@ -11,7 +11,8 @@ class measure
     public $import                      = null;
     public $vat                         = null;
     public $excise                      = null;
-
+    public $measure_conditions          = array();
+    public $document_codes              = array();
 
     function valid_measure_type()
     {

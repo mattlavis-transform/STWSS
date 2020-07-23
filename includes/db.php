@@ -19,6 +19,7 @@ require(dirname(__FILE__) . "../../classes/encrypt.php");
 require(dirname(__FILE__) . "../../classes/confirmation.php");
 require(dirname(__FILE__) . "../../classes/measure_type.php");
 require(dirname(__FILE__) . "../../classes/document_code.php");
+require(dirname(__FILE__) . "../../classes/measure_condition.php");
 require(dirname(__FILE__) . "../../classes/measure_type_range.php");
 
 // Components
