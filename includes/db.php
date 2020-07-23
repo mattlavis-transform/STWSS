@@ -1092,3 +1092,14 @@ function cmp($a, $b)
 
     return ($tmp);
 }
+
+
+function compare_measure_type_ids($a, $b)
+{
+    // for comparing the commodity / hierarchy objects
+    $tmp = strcmp($a->measure_type_id, $b->measure_type_id);
+    if ($tmp == 0) {
+        $tmp = strcmp($a->geographical_area_id, $b->geographical_area_id);
+    }
+    return ($tmp);
+}

@@ -32,7 +32,8 @@ class measure
         global $app;
         foreach ($app->measure_types as $mt) {
             if ($mt->id == $this->measure_type_id) {
-                $this->measure_type_description = $mt->description;
+                $this->measure_type_description = str_replace(",", " ", $mt->description);
+                $this->measure_type_description = str_replace("  ", " ", $this->measure_type_description);
                 break;
             }
         }

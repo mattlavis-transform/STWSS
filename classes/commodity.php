@@ -20,6 +20,12 @@ class commodity
     public $commodity_type = null;
     public $curl = null;
     public $json = null;
+    public $measure_string = null;
+    public $measure_string_import = null;
+    public $measure_string_export = null;
+    
+    public $measure_array_import = array();
+    public $measure_array_export = array();
 
     public function validate()
     {
@@ -342,7 +348,8 @@ class commodity
         }
     }
 
-    public function cleansed_description() {
+    public function cleansed_description()
+    {
         $array = array(",", '"', "'", "\n");
         $s = $this->description;
         foreach ($array as $item) {
@@ -356,24 +363,27 @@ class commodity
         //h1 ($this->goods_nomenclature_item_id);
         //$this->goods_nomenclature_item_id = "1006101000";
         //h1 ($this->goods_nomenclature_item_id);
+        global $app;
         $url = "https://www.trade-tariff.service.gov.uk/api/v2/commodities/" . $this->goods_nomenclature_item_id;
         $this->curl = curl_init();
         curl_setopt($this->curl, CURLOPT_URL, $url);
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
         $output = curl_exec($this->curl);
         $this->json = json_decode($output, true);
-        //prend ($this->json);
         if (isset($this->json["data"])) {
             $data = $this->json["data"];
         }
+        $this->measure_string = "";
         if (isset($this->json["included"])) {
             $included = $this->json["included"];
             $this->measures = array();
             foreach ($included as $item) {
                 $type =  $item["type"];
                 if ($type == "measure") {
+                    //prend ($item);
                     $measure = new measure();
-                    $measure->measure_type_id   = $item["relationships"]["measure_type"]["data"]["id"];
+                    $measure->measure_type_id       = $item["relationships"]["measure_type"]["data"]["id"];
+                    $measure->geographical_area_id  = $item["relationships"]["geographical_area"]["data"]["id"];
                     if ($measure->valid_measure_type()) {
                         $measure->get_type();
                         $measure->measure_sid       = $item["attributes"]["id"];
@@ -385,6 +395,25 @@ class commodity
                     }
                 }
             }
+
+            usort($this->measures, "compare_measure_type_ids");
+            foreach ($this->measures as $measure) {
+                $s = $measure->measure_type_description . " [" . $measure->geographical_area_id . "]";
+                if ($measure->import) {
+                    array_push($app->import_measure_permutations, $s);
+                    array_push($this->measure_array_import, $s);
+                    $this->measure_string_import .= $s;
+                    $this->measure_string_import .= ",";
+                } else {
+                    array_push($app->export_measure_permutations, $s);
+                    array_push($this->measure_array_export, $s);
+                    $this->measure_string_export .= $measure->measure_type_id . "[" . $measure->geographical_area_id . "]";
+                    $this->measure_string_export .= ",";
+                }
+            }
+            $this->measure_string_import = rtrim($this->measure_string_import, ",");
+            $this->measure_string_export = rtrim($this->measure_string_export, ",");
+
         }
     }
 }

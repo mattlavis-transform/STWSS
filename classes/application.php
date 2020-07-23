@@ -54,6 +54,8 @@ class application
     public $content_records = array();
     public $measure_type_ranges = array();
     
+    public $import_measure_permutations = array();
+    public $export_measure_permutations = array();
 
     function __construct()
     {
