@@ -375,6 +375,7 @@ class commodity
                     $measure = new measure();
                     $measure->measure_type_id   = $item["relationships"]["measure_type"]["data"]["id"];
                     if ($measure->valid_measure_type()) {
+                        $measure->get_type();
                         $measure->measure_sid       = $item["attributes"]["id"];
                         $measure->import            = $item["attributes"]["import"];
                         $measure->excise            = $item["attributes"]["excise"];

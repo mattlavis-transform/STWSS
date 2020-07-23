@@ -12,6 +12,7 @@ $string_delimiter = '"';
 require("../includes/db.php");
 $app = new application();
 $app->get_commodities_from_API();
+$app->get_measure_types2();
 
 // Get the measures
 foreach ($app->commodities as $commodity) {
@@ -29,7 +30,7 @@ foreach ($app->commodities as $commodity) {
             echo ($string_delimiter . $commodity->number_indents . $string_delimiter . $col_delimiter);
             echo ($string_delimiter . $commodity->cleansed_description() . $string_delimiter . $col_delimiter);
             echo ($measure->measure_sid . $col_delimiter);
-            echo ($string_delimiter . $measure->measure_type_id . $string_delimiter . $col_delimiter);
+            echo ($string_delimiter . $measure->measure_type_description . $string_delimiter . $col_delimiter);
 
             echo ($row_delimiter);
         }

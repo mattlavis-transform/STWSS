@@ -26,4 +26,15 @@ class measure
         }
         return ($valid);
     }
+
+    function get_type()
+    {
+        global $app;
+        foreach ($app->measure_types as $mt) {
+            if ($mt->id == $this->measure_type_id) {
+                $this->measure_type_description = $mt->description;
+                break;
+            }
+        }
+    }
 }

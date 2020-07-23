@@ -476,7 +476,7 @@ class application
         $result = pg_query($conn, $sql);
         if ($result) {
             while ($row = pg_fetch_array($result)) {
-                $obj = new section;
+                $obj = new measure_type;
                 $obj->id = $row['measure_type_id'];
                 $obj->title = $row['description'];
                 $obj->description = $row['measure_type_id'] . " - " . $row['description'];
@@ -485,6 +485,23 @@ class application
             }
         }
         $this->get_measure_type_content();
+    }
+
+    public function get_measure_types2()
+    {
+        global $conn;
+        $sql = "select measure_type_id, description from measure_types where measure_type_series_id in ('A', 'B') order by 1;";
+        $result = pg_query($conn, $sql);
+        if ($result) {
+            while ($row = pg_fetch_array($result)) {
+                $obj = new measure_type;
+                $obj->id = $row['measure_type_id'];
+                $obj->title = $row['description'];
+                $obj->description = $row['measure_type_id'] . " - " . $row['description'];
+
+                array_push($this->measure_types, $obj);
+            }
+        }
     }
 
 
