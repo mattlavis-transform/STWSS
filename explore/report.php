@@ -9,8 +9,9 @@ if ($wts == "1") {
     $string_delimiter   = '"';
 
 } else {
+    $id = get_querystring("id");
     header("Content-type: text/csv");
-    header("Content-Disposition: attachment; filename=report.csv");
+    header("Content-Disposition: attachment; filename=measure_report_" . $id . ".csv");
     header("Pragma: no-cache");
     header("Expires: 0");
 
