@@ -46,7 +46,7 @@ require("../includes/meta.php");
 
                                     <td class="govuk-table__cell nr">
                                         <a href="heading.html?id=<?= $heading->id ?>">View commodities</a><br />
-                                        <a href="report.html?id=<?= $chapter->id ?>">View measure report</a>
+                                        <a target="_blank" href="report.html?wts=1&id=<?= $heading->id ?>">View measure report</a>
                                     </td>
 
                                 </tr>

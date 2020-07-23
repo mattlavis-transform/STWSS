@@ -37,10 +37,11 @@ $app->export_measure_permutations = set($app->export_measure_permutations);
 
 // Write the measures
 echo ($start_string);
-//echo ("Commodity,Number indents,Description,Measure ID,Import measures,Export measures,");
 echo (",,,Import measures");
 echo (str_repeat(",", count($app->import_measure_permutations)));
-echo ("Export measures");
+if (count($app->export_measure_permutations) > 0) {
+    echo ("Export measures");
+}
 echo ($row_delimiter);
 
 echo ("Commodity,Indents,Description,");

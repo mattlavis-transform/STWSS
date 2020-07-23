@@ -350,20 +350,18 @@ class commodity
 
     public function cleansed_description()
     {
-        $array = array(",", '"', "'", "\n");
+        $array = array(",", '"', "'", "\n", "\r", "<br>", "<br/>");
         $s = $this->description;
         foreach ($array as $item) {
-            $s = str_replace($item, "", $s);
+            $s = str_replace($item, " ", $s);
         }
         $s = str_replace("&nbsp;", " ", $s);
+        $s = str_replace("  ", " ", $s);
         return ($s);
     }
 
     public function get_measures()
     {
-        //h1 ($this->goods_nomenclature_item_id);
-        //$this->goods_nomenclature_item_id = "1006101000";
-        //h1 ($this->goods_nomenclature_item_id);
         global $app;
 
 
@@ -379,12 +377,6 @@ class commodity
             echo 'Curl error: ' . curl_error($this->curl);
         }
         */
-        /*
-        if ($this->goods_nomenclature_item_id == "1006309822") {
-            pre ($url);
-            prend($this->json);
-        }
-        */
         if (isset($this->json["data"])) {
             $data = $this->json["data"];
         }
@@ -395,7 +387,6 @@ class commodity
             foreach ($included as $item) {
                 $type =  $item["type"];
                 if ($type == "measure") {
-                    //prend ($item);
                     $measure = new measure();
                     $measure->measure_type_id       = $item["relationships"]["measure_type"]["data"]["id"];
                     $measure->geographical_area_id  = $item["relationships"]["geographical_area"]["data"]["id"];
@@ -410,16 +401,12 @@ class commodity
                     }
                     if (isset($item["relationships"]["measure_conditions"])) {
                         $conditions = $item["relationships"]["measure_conditions"]["data"];
-                        //h1 ("Found measure conditions " . count($conditions));
-                        //pre ($conditions);
                         foreach ($conditions as $condition) {
                             $mc = new measure_condition();
                             $mc->measure_condition_sid  = $condition["id"];
                             $mc->measure_sid            = $measure->measure_sid;
                             array_push($measure->measure_conditions, $mc);
                         }
-                    } else {
-                        //h1 ("Not found measure conditions");
                     }
                 } elseif ($type == "measure_condition") {
                     //h1("Found included condition " . $item["attributes"]["document_code"]);
@@ -433,13 +420,19 @@ class commodity
                             }
                         }
                     }
-                    //prend($item);
                 }
             }
 
             usort($this->measures, "compare_measure_type_ids");
             foreach ($this->measures as $measure) {
-                $s = $measure->measure_type_description . " [" . $measure->geographical_area_id . "]";
+                $s = $measure->measure_type_description . " for geo. area " . $measure->geographical_area_id . " ";
+                $dc = $measure->document_code_string();
+                if ($dc != "") {
+                    $s .= " with document code(s) " . $dc;
+                }
+                $s = trim($s);
+                $s = str_replace("  ", " ", $s);
+                
                 if ($measure->import) {
                     array_push($app->import_measure_permutations, $s);
                     array_push($this->measure_array_import, $s);
@@ -448,7 +441,7 @@ class commodity
                 } else {
                     array_push($app->export_measure_permutations, $s);
                     array_push($this->measure_array_export, $s);
-                    $this->measure_string_export .= $measure->measure_type_id . "[" . $measure->geographical_area_id . "]";
+                    $this->measure_string_export .= $s;
                     $this->measure_string_export .= ",";
                 }
             }

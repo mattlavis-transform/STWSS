@@ -13,6 +13,7 @@ class measure
     public $excise                      = null;
     public $measure_conditions          = array();
     public $document_codes              = array();
+    public $document_code_string        = "";
 
     function valid_measure_type()
     {
@@ -38,5 +39,15 @@ class measure
                 break;
             }
         }
+    }
+
+    function document_code_string() {
+        $s = "";
+        $this->document_codes = set($this->document_codes);
+        foreach ($this->document_codes as $dc) {
+            $s.= $dc . " + ";
+        }
+        $s = rtrim($s, " + ");
+        return ($s);
     }
 }

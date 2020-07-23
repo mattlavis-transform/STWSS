@@ -38,7 +38,7 @@ require("../includes/meta.php");
                                 <th scope="col" class="govuk-table__header c">Indents</th>
                                 <th scope="col" class="govuk-table__header">Title</th>
                                 <th scope="col" class="govuk-table__header c">End line</th>
-                                <th scope="col" class="govuk-table__header">Actions</th>
+                                <!--<th scope="col" class="govuk-table__header">Actions</th>//-->
                             </tr>
                         </thead>
                         <tbody class="govuk-table__body">
@@ -51,9 +51,11 @@ require("../includes/meta.php");
                                     <td class="govuk-table__cell c"><?= $commodity->number_indents ?></td>
                                     <td class="govuk-table__cell"><?= $commodity->description ?></td>
                                     <td class="govuk-table__cell c"><?= YN($commodity->declarable) ?></td>
+                                    <!--
                                     <td class="govuk-table__cell nr">
                                         <a href="chapter.html?id=<?= $commodity->id ?>">View measures</a>
                                     </td>
+                                    //-->
 
                                 </tr>
                             <?php
