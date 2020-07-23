@@ -1,4 +1,5 @@
 <?php
+set_time_limit(360);
 ini_set('memory_limit', '4096M');
 require("../includes/db.php");
 $wts = get_querystring(("wts"));
