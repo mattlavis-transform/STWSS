@@ -1,2 +1,4 @@
 /vendor/
 /sql/
+data/.DS_Store
+.DS_Store
