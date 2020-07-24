@@ -45,6 +45,7 @@ class commodity
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
         $output = curl_exec($this->curl);
         $this->json = json_decode($output, true);
+        curl_close($this->curl);
 
         if (isset($this->json["data"])) {
             $data = $this->json["data"];
@@ -63,6 +64,7 @@ class commodity
             curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
             $output = curl_exec($this->curl);
             $this->json = json_decode($output, true);
+            curl_close($this->curl);
 
             $found = false;
             if (isset($this->json["included"])) {
@@ -362,9 +364,20 @@ class commodity
 
     public function get_measures()
     {
-        global $app;
+        global $app, $conn;
 
 
+        $sql = "select blob from goods_nomenclatures where goods_nomenclature_item_id = $1";
+        $stmt = uniqid();
+        pg_prepare($conn, $stmt, $sql);
+        $result = pg_execute($conn, $stmt, array($this->goods_nomenclature_item_id));
+        $row_count = pg_num_rows($result);
+        if (($result) && ($row_count > 0)) {
+            $row = pg_fetch_array($result);
+            $this->json = json_decode($row["blob"], true);
+        }
+
+        /*
         $url = "https://www.trade-tariff.service.gov.uk/api/v2/commodities/" . $this->goods_nomenclature_item_id;
         $this->curl = curl_init();
         curl_setopt($this->curl, CURLOPT_URL, $url);
@@ -372,11 +385,9 @@ class commodity
         curl_setopt($this->curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
         $output = curl_exec($this->curl);
         $this->json = json_decode($output, true);
-        /*
-        if(curl_errno($this->curl)){
-            echo 'Curl error: ' . curl_error($this->curl);
-        }
+        curl_close($this->curl);
         */
+
         if (isset($this->json["data"])) {
             $data = $this->json["data"];
         }

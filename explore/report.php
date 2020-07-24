@@ -24,7 +24,7 @@ if ($wts == "1") {
 }
 
 $app = new application();
-$app->get_commodities_from_API();
+$app->get_commodities_from_DB();
 $app->get_measure_types2();
 
 // Get the measures

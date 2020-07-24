@@ -218,6 +218,7 @@ class application
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
         $output = curl_exec($this->curl);
         $this->json = json_decode($output, true);
+        curl_close($this->curl);
 
         if (isset($this->json["data"])) {
             $data = $this->json["data"];
@@ -246,6 +247,7 @@ class application
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
         $output = curl_exec($this->curl);
         $this->json = json_decode($output, true);
+        curl_close($this->curl);
 
         // Get section details
         if (isset($this->json["data"])) {
@@ -287,6 +289,7 @@ class application
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
         $output = curl_exec($this->curl);
         $this->json = json_decode($output, true);
+        curl_close($this->curl);
 
         //prend ($this->json);
 
@@ -326,6 +329,7 @@ class application
                     $heading->goods_nomenclature_item_id = $item["attributes"]["goods_nomenclature_item_id"];
                     $heading->description = $item["attributes"]["formatted_description"];
                     $heading->id = substr($heading->goods_nomenclature_item_id, 0, 4);
+                    //$heading->persist();
                     array_push($this->headings, $heading);
                 }
             }
@@ -341,6 +345,7 @@ class application
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
         $output = curl_exec($this->curl);
         $this->json = json_decode($output, true);
+        curl_close($this->curl);
 
         // Get chapter details
         if (isset($this->json["data"])) {
@@ -361,13 +366,65 @@ class application
                 }
                 //pre($relationships);
             }
-
         }
-        //die();
 
         // Get subsidiary heading details
         if (isset($this->json["included"])) {
             $included = $this->json["included"];
+            $this->commodities = array();
+            foreach ($included as $item) {
+                $type =  $item["type"];
+                if ($type == "commodity") {
+                    $commodity = new commodity();
+                    $commodity->goods_nomenclature_sid = $item["attributes"]["goods_nomenclature_sid"];
+                    $commodity->goods_nomenclature_item_id = $item["attributes"]["goods_nomenclature_item_id"];
+                    $commodity->productline_suffix = $item["attributes"]["producline_suffix"];
+                    $commodity->number_indents = $item["attributes"]["number_indents"];
+                    $commodity->description = $item["attributes"]["formatted_description"];
+                    $commodity->declarable = $item["attributes"]["leaf"];
+                    array_push($this->commodities, $commodity);
+                }
+            }
+        }
+    }
+
+    public function get_commodities_from_DB()
+    {
+        global $conn;
+        $heading_id = get_querystring("id");
+        //h1($heading_id);
+        $sql = "select * from headings where heading_id = $1"; // . $heading_id;
+        $stmt = uniqid();
+        pg_prepare($conn,  $stmt, $sql);
+        $result = pg_execute($conn,  $stmt, array($heading_id));
+        $row_count = pg_num_rows($result);
+        if (($result) && ($row_count > 0)) {
+            $row = pg_fetch_array($result);
+            $this->heading = new heading();
+            $this->heading->goods_nomenclature_sid = $row["goods_nomenclature_sid"];
+            $this->heading->goods_nomenclature_item_id = $row["goods_nomenclature_item_id"];
+            $this->heading->description = $row["description"];
+            $this->heading->id = substr($this->heading->goods_nomenclature_item_id, 0, 4);
+            $this->heading->json = json_decode($row["blob"], true);
+        }
+
+        // Get chapter details
+        if (isset($this->heading->json["data"])) {
+            //h1 ("getting data");
+            $data = $this->heading->json["data"];
+
+            // Get the section
+            if (isset($data["relationships"])) {
+                $relationships = $data["relationships"];
+                if (isset($relationships["section"])) {
+                    $this->heading->section_id = $relationships["section"]["data"]["id"];
+                }
+            }
+        }
+
+        // Get subsidiary heading details
+        if (isset($this->heading->json["included"])) {
+            $included = $this->heading->json["included"];
             $this->commodities = array();
             foreach ($included as $item) {
                 $type =  $item["type"];
