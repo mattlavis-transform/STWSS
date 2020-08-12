@@ -3,6 +3,8 @@ require("./db.php");
 $action = get_request("action");
 $app = new application();
 
+//application::debug();
+
 switch ($action) {
     case "commodity_search":
         $goods_nomenclature_item_id = get_request("goods_nomenclature_item_id");
@@ -13,8 +15,17 @@ switch ($action) {
     case "select_linkage_type":
         $link_type = get_request("link_type");
         $id = get_request("id");
-        $url = "/content/link_02.html?link_type=" . $link_type . "&id=" . $id;
-        header("Location: " . $url);
+        if ($link_type != "") {
+            $url = "/content/link_02.html?link_type=" . $link_type . "&id=" . $id;
+            header("Location: " . $url);
+        } else {
+            $errors = array();
+            array_push($errors, "section");
+            $data = serialize($errors);
+            $data_encrypted = SA_Encryption::encrypt_to_url_param($data);
+            $url = "/content/link_01.html?link_type=" . $link_type . "&id=" . $id . "&err=1&data=" . $data_encrypted;
+            header("Location: " . $url);
+        }
         break;
 
     case "create_content_linkage":

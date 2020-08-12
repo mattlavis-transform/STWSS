@@ -27,29 +27,6 @@ require("../includes/meta.php");
                 <div class="govuk-grid-row">
                     <div class="govuk-grid-column-full">
                         <h1 class="govuk-heading-l">Link content to <?= $app->link_type_string ?></h1>
-                        <!--
-                        <table class="govuk-table">
-                            <tbody class="govuk-table__body">
-                                <tr class="govuk-table__row">
-                                    <th scope="col" class="govuk-table__cell">ID</th>
-                                    <td class="govuk-table__cell"><?= $content->id ?></td>
-                                </tr>
-                                <tr class="govuk-table__row">
-                                    <th scope="col" class="govuk-table__cell">Title</th>
-                                    <td class="govuk-table__cell"><?= $content->step_description ?></td>
-                                </tr>
-                                <tr class="govuk-table__row">
-                                    <th scope="col" class="govuk-table__cell">Description</th>
-                                    <td class="govuk-table__cell"><?= $content->step_howto_description ?></td>
-                                </tr>
-                                <tr class="govuk-table__row">
-                                    <th scope="col" class="govuk-table__cell">URL</th>
-                                    <td class="govuk-table__cell"><?= $content->step_url ?></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        //-->
-
                         <?php
                         new radio("content_linking_method", $app->content_linking_methods, "Do you want to link to existing content or create a new content item?", "", false, "");
                         new button("submit", "Continue");
@@ -58,7 +35,6 @@ require("../includes/meta.php");
                         new hidden("sid", $app->sid);
                         new hidden("id", $app->identifier);
                         ?>
-
                     </div>
                 </div>
             </form>

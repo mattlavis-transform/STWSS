@@ -195,51 +195,82 @@ class content
         global $conn;
         $this->id = get_querystring("id");
         $section_id = get_querystring("section");
-        $sql = "INSERT INTO signposting_step_section_assignment
-        (signposting_step_id, section_id, date_created)
-        VALUES ($1, $2, current_timestamp)
-        on conflict ON CONSTRAINT signposting_step_section_assignment_un DO NOTHING";
-        $command = uniqid();
-        pg_prepare($conn, $command, $sql);
-        pg_execute($conn, $command, array(
-            $this->id, $section_id
-        ));
-        $this->unblanket();
+        if ($section_id == "0") {
+            $errors = array();
+            array_push($errors, "section");
+            $data = serialize($errors);
+            $data_encrypted = SA_Encryption::encrypt_to_url_param($data);
+            $url = "/content/link_02.html?link_type=section&id=" . $this->id . "&err=1&data=" . $data_encrypted;
+            header("Location: " . $url);
+            die();
+        } else {
+            $sql = "INSERT INTO signposting_step_section_assignment
+            (signposting_step_id, section_id, date_created)
+            VALUES ($1, $2, current_timestamp)
+            on conflict ON CONSTRAINT signposting_step_section_assignment_un DO NOTHING";
+            $command = uniqid();
+            pg_prepare($conn, $command, $sql);
+            pg_execute($conn, $command, array(
+                $this->id, $section_id
+            ));
+            $this->unblanket();
+        }
     }
-
 
     public function link_chapter()
     {
         global $conn;
+        //application::debug();
         $this->id = get_querystring("id");
         $chapter = intval(get_querystring("chapter"));
-        $sql = "INSERT INTO signposting_step_chapter_assignment
-        (signposting_step_id, chapter_id, date_created)
-        VALUES ($1, $2, current_timestamp)
-        on conflict ON CONSTRAINT signposting_step_chapter_assignment_un DO NOTHING";
-        $command = uniqid();
-        pg_prepare($conn, $command, $sql);
-        pg_execute($conn, $command, array(
-            $this->id, $chapter
-        ));
-        $this->unblanket();
+        if ($chapter == 0) {
+            $errors = array();
+            array_push($errors, "chapter");
+            $data = serialize($errors);
+            $data_encrypted = SA_Encryption::encrypt_to_url_param($data);
+            $url = "/content/link_02.html?link_type=chapter&id=" . $this->id . "&err=1&data=" . $data_encrypted;
+            header("Location: " . $url);
+            die();
+        } else {
+            $sql = "INSERT INTO signposting_step_chapter_assignment
+            (signposting_step_id, chapter_id, date_created)
+            VALUES ($1, $2, current_timestamp)
+            on conflict ON CONSTRAINT signposting_step_chapter_assignment_un DO NOTHING";
+            $command = uniqid();
+            pg_prepare($conn, $command, $sql);
+            pg_execute($conn, $command, array(
+                $this->id, $chapter
+            ));
+            $this->unblanket();
+        }
     }
 
     public function link_document_code()
     {
         global $conn;
+
         $this->id = get_querystring("id");
         $document_code = get_querystring("document_code");
-        $sql = "INSERT INTO signposting_step_document_code_assignment
-        (signposting_step_id, document_code, date_created)
-        VALUES ($1, $2, current_timestamp)
-        on conflict ON CONSTRAINT signposting_step_document_code_assignment_un DO NOTHING";
-        $command = uniqid();
-        pg_prepare($conn, $command, $sql);
-        pg_execute($conn, $command, array(
-            $this->id, $document_code
-        ));
-        $this->unblanket();
+        if ($document_code == "") {
+            $errors = array();
+            array_push($errors, "document_code");
+            $data = serialize($errors);
+            $data_encrypted = SA_Encryption::encrypt_to_url_param($data);
+            $url = "/content/link_02.html?link_type=document_code&id=" . $this->id . "&err=1&data=" . $data_encrypted;
+            header("Location: " . $url);
+            die();
+        } else {
+            $sql = "INSERT INTO signposting_step_document_code_assignment
+            (signposting_step_id, document_code, date_created)
+            VALUES ($1, $2, current_timestamp)
+            on conflict ON CONSTRAINT signposting_step_document_code_assignment_un DO NOTHING";
+            $command = uniqid();
+            pg_prepare($conn, $command, $sql);
+            pg_execute($conn, $command, array(
+                $this->id, $document_code
+            ));
+            $this->unblanket();
+        }
     }
 
     public function link_measure_type()
@@ -247,16 +278,26 @@ class content
         global $conn;
         $this->id = get_querystring("id");
         $measure_type = get_querystring("measure_type");
-        $sql = "INSERT INTO signposting_step_measure_type_assignment
-        (signposting_step_id, measure_type_id, date_created)
-        VALUES ($1, $2, current_timestamp)
-        on conflict ON CONSTRAINT signposting_step_measure_type_assignment_un DO NOTHING";
-        $command = uniqid();
-        pg_prepare($conn, $command, $sql);
-        pg_execute($conn, $command, array(
-            $this->id, $measure_type
-        ));
-        $this->unblanket();
+        if ($measure_type == "") {
+            $errors = array();
+            array_push($errors, "measure_type");
+            $data = serialize($errors);
+            $data_encrypted = SA_Encryption::encrypt_to_url_param($data);
+            $url = "/content/link_02.html?link_type=measure_type&id=" . $this->id . "&err=1&data=" . $data_encrypted;
+            header("Location: " . $url);
+            die();
+        } else {
+            $sql = "INSERT INTO signposting_step_measure_type_assignment
+            (signposting_step_id, measure_type_id, date_created)
+            VALUES ($1, $2, current_timestamp)
+            on conflict ON CONSTRAINT signposting_step_measure_type_assignment_un DO NOTHING";
+            $command = uniqid();
+            pg_prepare($conn, $command, $sql);
+            pg_execute($conn, $command, array(
+                $this->id, $measure_type
+            ));
+            $this->unblanket();
+        }
     }
 
     public function link_commodity()
@@ -299,7 +340,6 @@ class content
             pg_execute($conn, $command, array(
                 $this->id, $commodity->goods_nomenclature_sid
             ));
-
         } else {
             h1("not found");
             die();

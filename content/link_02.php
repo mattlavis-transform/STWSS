@@ -1,6 +1,7 @@
 <?php
 require("../includes/db.php");
 $app = new application();
+$app->check_for_errors();
 $content = new content();
 $content->populate();
 $link_type = get_request("link_type");
@@ -71,6 +72,7 @@ require("../includes/meta.php");
                             </tbody>
                         </table>
                         <?php
+                        new error_summary();
                         switch ($link_type) {
                             case "section":
                                 $app->get_sections();

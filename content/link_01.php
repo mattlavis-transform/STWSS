@@ -6,6 +6,7 @@ $app->get_subheaders();
 $content = new content();
 $content->get_link_options();
 $content->populate();
+$app->check_for_errors();
 ?>
 <!DOCTYPE html>
 <html lang="en" class="govuk-template ">
@@ -54,6 +55,8 @@ require("../includes/meta.php");
                         </table>
 
                         <?php
+                        new error_summary();
+
                         new radio("link_type", $content->link_options, "Select the type of object to which you would like to link this content item", "", false, $content->subheader_id);
                         new button("submit", "Continue");
                         new hidden("action", "select_linkage_type");
