@@ -39,11 +39,11 @@ require("../includes/meta.php");
                                     <td class="govuk-table__cell"><?= $content->id ?></td>
                                 </tr>
                                 <tr class="govuk-table__row">
-                                    <th scope="col" class="govuk-table__cell">Title</th>
+                                    <th scope="col" class="govuk-table__cell">Step title</th>
                                     <td class="govuk-table__cell"><?= $content->step_description ?></td>
                                 </tr>
                                 <tr class="govuk-table__row">
-                                    <th scope="col" class="govuk-table__cell">Description</th>
+                                    <th scope="col" class="govuk-table__cell">Explanatory text</th>
                                     <td class="govuk-table__cell"><?= $content->step_howto_description ?></td>
                                 </tr>
                                 <tr class="govuk-table__row">
