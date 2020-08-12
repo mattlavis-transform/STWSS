@@ -9,5 +9,6 @@
 "link_type","Select the type of object to link to","link_type"
 "section","Select the section","section"
 "chapter","Select the chapter","chapter"
-"document_code","Select the document code","document_code"
-"measure_type","Select the measure type","measure_type"
+"document_code","Enter a valid document code","document_code"
+"measure_type","Enter a valid measure type","measure_type"
+"commodity_code","Enter a valid commodity code","commodity_code"

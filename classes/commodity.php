@@ -36,7 +36,8 @@ class commodity
                   If one of the child codes matches, then we are cool
         */
         $this->pad_commodity_code();
-
+        pre ($this);
+        //application::debug();
         $retval = null;
         $root = "https://www.trade-tariff.service.gov.uk/api/v2/commodities/";
         $url = $root . $this->goods_nomenclature_item_id;
@@ -55,7 +56,7 @@ class commodity
             $this->productline_suffix = "80";
             $this->commodity_type = "endline";
             $retval = true; // Returns true if the commodity code exists as a leaf / end-line only
-            //h1("I am an end line and exist in the database");
+            h1("I am an end line and exist in the database");
         } else {
             $root = "https://www.trade-tariff.service.gov.uk/api/v2/headings/";
             $url = $root . substr($this->goods_nomenclature_item_id, 0, 4);
@@ -86,11 +87,11 @@ class commodity
                 }
                 $retval = $found;
                 if ($found == true) {
-                    //h1("I am an intermediate code and I exist in the database");
+                    h1("I am an intermediate code and I exist in the database");
                     $retval = true;
                 } else {
                     if (isset($this->json["data"])) {
-                        //h1("I am a heading");
+                        h1("I am a heading");
                         $this->goods_nomenclature_sid = $this->json["data"]["id"];
                         $this->description = $this->json["data"]["attributes"]["formatted_description"];
                         $this->number_indents = 0;
@@ -102,10 +103,11 @@ class commodity
             } else {
                 $retval = false;
                 $this->commodity_type = null;
-                //h1("I do not exist");
+                h1("I do not exist");
             }
         }
-        $this->terminate_curl();
+        //$this->terminate_curl();
+        //die();
         return ($retval);
     }
 

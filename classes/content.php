@@ -341,7 +341,12 @@ class content
                 $this->id, $commodity->goods_nomenclature_sid
             ));
         } else {
-            h1("not found");
+            $errors = array();
+            array_push($errors, "commodity_code");
+            $data = serialize($errors);
+            $data_encrypted = SA_Encryption::encrypt_to_url_param($data);
+            $url = "/content/link_02.html?link_type=commodity&id=" . $this->id . "&err=1&data=" . $data_encrypted;
+            header("Location: " . $url);
             die();
         };
         $this->unblanket();
