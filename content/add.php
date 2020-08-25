@@ -2,6 +2,7 @@
 require("../includes/db.php");
 $app = new application();
 $app->get_content_linking_methods();
+$app->check_for_errors();
 ?>
 <!DOCTYPE html>
 <html lang="en" class="govuk-template ">
@@ -28,6 +29,7 @@ require("../includes/meta.php");
                     <div class="govuk-grid-column-full">
                         <h1 class="govuk-heading-l">Link content to <?= $app->link_type_string ?></h1>
                         <?php
+                        new error_summary();
                         new radio("content_linking_method", $app->content_linking_methods, "Do you want to link to existing content or create a new content item?", "", false, "");
                         new button("submit", "Continue");
                         new hidden("action", "add_content_to_item");

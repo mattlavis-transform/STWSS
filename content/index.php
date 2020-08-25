@@ -31,7 +31,7 @@ require("../includes/meta.php");
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
                     <h1 class="govuk-heading-l">Content</h1>
-                    <details class="govuk-details" data-module="govuk-details">
+                    <details class="govuk-details" data-module="govuk-details" style="display:none">
                         <summary class="govuk-details__summary">
                             <span class="govuk-details__summary-text">
                                 Filter / search the content database

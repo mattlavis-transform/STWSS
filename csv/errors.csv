@@ -12,3 +12,4 @@
 "document_code","Enter a valid document code","document_code"
 "measure_type","Enter a valid measure type","measure_type"
 "commodity_code","Enter a valid commodity code","commodity_code"
+"content_linking_method","Select whether to find existing or create new content","content_linking_method"

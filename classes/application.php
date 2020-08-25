@@ -889,16 +889,28 @@ class application
 
     public function apply_content_linking_method()
     {
-        $this->content_linking_method = get_request("content_linking_method");
         $this->link_type = get_request("link_type");
         $this->sid = get_request("sid");
         $this->id = get_request("id");
-        if ($this->content_linking_method == "new") {
-            $url = "/content/edit.html?link_type=" . $this->link_type . "&sid=" . $this->sid . "&identifier=" . $this->id;
+    
+        //application::debug();
+    
+        $this->content_linking_method = get_request("content_linking_method");
+        if ($this->content_linking_method == "") {
+            $errors = array();
+            array_push($errors, "content_linking_method");
+            $data = serialize($errors);
+            $data_encrypted = SA_Encryption::encrypt_to_url_param($data);
+            $url = "/content/add.html?link_type=" . $this->link_type . "&id=" . $this->id . "&sid=" . $this->sid . "&err=1&data=" . $data_encrypted;
+            header("Location: " . $url);
         } else {
-            $url = "/content/find.html?link_type=" . $this->link_type . "&sid=" . $this->sid . "&id=" . $this->id;
+            if ($this->content_linking_method == "new") {
+                $url = "/content/edit.html?link_type=" . $this->link_type . "&sid=" . $this->sid . "&identifier=" . $this->id;
+            } else {
+                $url = "/content/find.html?link_type=" . $this->link_type . "&sid=" . $this->sid . "&id=" . $this->id;
+            }
+            header("Location: " . $url);
         }
-        header("Location: " . $url);
     }
 
     public function show_content_linkage_message()

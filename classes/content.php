@@ -297,6 +297,7 @@ class content
                 $this->id, $measure_type
             ));
             $this->unblanket();
+            //application::debug();
         }
     }
 
