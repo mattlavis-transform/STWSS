@@ -55,6 +55,7 @@ if ($server_name == "stwss.herokuapp.com") {
     $dbuser = $dbuser_local;
     $pwd = $pwd_local;
 }
+//h1 ($dbuser );
 $conn = pg_connect("host=" . $host . " port=5432 dbname=" . $dbase . " user=" . $dbuser . " password=" . $pwd);
 
 $page = intval(get_querystring("page"));

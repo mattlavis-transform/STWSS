@@ -17,7 +17,7 @@ class measure_type
             header("Location: " . $url);
         }
 
-        $sql = "select description from measure_types where measure_type_id = $1;";
+        $sql = "select description from chieg.measure_types where measure_type_id = $1;";
         pg_prepare($conn, "get_measure_type", $sql);
         $result = pg_execute($conn, "get_measure_type", array($this->id));
         $row_count = pg_num_rows($result);
@@ -35,7 +35,7 @@ class measure_type
         global $conn;
         $sql = "select ssmta.id as unique_id, ssmta.measure_type_id, ss.id, ss.step_description, ss.step_description, ss.step_howto_description,
         ss.step_url
-        from signposting_step_measure_type_assignment ssmta, signposting_steps ss
+        from chieg.signposting_step_measure_type_assignment ssmta, chieg.signposting_steps ss
         where ss.id = ssmta.signposting_step_id 
         and ssmta.measure_type_id = $1
         order by ss.id;";

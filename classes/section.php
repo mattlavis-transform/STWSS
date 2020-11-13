@@ -29,7 +29,7 @@ class section
         }
 
         $sql = "select numeral, title, chapter_from, chapter_to
-        from sections where id = $1;";
+        from chieg.sections where id = $1;";
         pg_prepare($conn, "get_section", $sql);
         $result = pg_execute($conn, "get_section", array($this->id));
         $row_count = pg_num_rows($result);
@@ -50,7 +50,8 @@ class section
         global $conn;
         $sql = "select sssa.id as unique_id, ss.id, ss.step_description, ss.step_howto_description,
         ss.step_url, ss.header_id, ss.subheader_id, ssh.header_description, sss.subheader_description 
-        from signposting_step_section_assignment sssa, signposting_steps ss, signposting_step_headers ssh, signposting_step_subheaders sss 
+        from chieg.signposting_step_section_assignment sssa, chieg.signposting_steps ss,
+        chieg.signposting_step_headers ssh, chieg.signposting_step_subheaders sss 
         where ss.id = sssa.signposting_step_id 
         and ss.header_id = ssh.id 
         and ss.subheader_id = sss.id 
@@ -58,7 +59,7 @@ class section
         order by ss.id";
         $sql = "select sssa.id as unique_id, ss.id, ss.step_description, ss.step_howto_description,
         ss.step_url
-        from signposting_step_section_assignment sssa, signposting_steps ss
+        from chieg.signposting_step_section_assignment sssa, chieg.signposting_steps ss
         where ss.id = sssa.signposting_step_id 
         and section_id = $1
         order by ss.id";

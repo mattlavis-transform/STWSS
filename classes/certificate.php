@@ -13,7 +13,7 @@ class certificate
 
     public function get_details() {
         global $conn;
-        $sql = "select description from certificates where code = $1;";
+        $sql = "select description from chieg.certificates where code = $1;";
         pg_prepare($conn, "get_details", $sql);
         $result = pg_execute($conn, "get_details", array($this->code));
         $row_count = pg_num_rows($result);
@@ -26,7 +26,7 @@ class certificate
     public function get_usage() {
         global $conn;
         $sql = "select gn.goods_nomenclature_item_id, gn.description, gn.number_indents 
-        from goods_nomenclatures gn, measure_association_goods_nomenclatures magn,
+        from chieg.goods_nomenclatures gn, chieg.measure_association_goods_nomenclatures magn,
         measures m, measure_conditions mc 
         where mc.measure_sid = m.measure_sid 
         and magn.measure_sid = m.measure_sid 

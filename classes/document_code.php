@@ -17,7 +17,7 @@ class document_code
             header("Location: " . $url);
         }
 
-        $sql = "select description from certificates where code = $1;";
+        $sql = "select description from chieg.certificates where code = $1;";
         pg_prepare($conn, "get_document_code", $sql);
         $result = pg_execute($conn, "get_document_code", array($this->id));
         $row_count = pg_num_rows($result);
@@ -35,7 +35,7 @@ class document_code
         global $conn;
         $sql = "select ssdca.id as unique_id, ssdca.document_code, ss.id, ss.step_description, ss.step_description, ss.step_howto_description,
         ss.step_url
-        from signposting_step_document_code_assignment ssdca, signposting_steps ss
+        from chieg.signposting_step_document_code_assignment ssdca, chieg.signposting_steps ss
         where ss.id = ssdca.signposting_step_id 
         and ssdca.document_code = $1
         order by ss.id;";

@@ -147,7 +147,7 @@ class application
     {
         global $conn;
         $sql = "select c.code, c.certificate_type_code, c.certificate_code, c.description
-        from certificates c order by 1";
+        from chieg.certificates c order by 1";
 
         $result = pg_query($conn, $sql);
         $temp = array();
@@ -169,7 +169,7 @@ class application
     {
         global $conn;
         $sql = "select ss.id, ss.step_description, ssdca.document_code 
-        from signposting_steps ss, signposting_step_document_code_assignment ssdca 
+        from chieg.signposting_steps ss, chieg.signposting_step_document_code_assignment ssdca 
         where ss.id = ssdca.id
         order by 3, 1;";
         $result = pg_query($conn, $sql);
@@ -190,7 +190,7 @@ class application
     {
         global $conn;
         $sql = "select id, numeral, title, position, chapter_from, chapter_to 
-        from sections s 
+        from chieg.sections s 
         order by position;";
         $result = pg_query($conn, $sql);
         if ($result) {
@@ -393,7 +393,7 @@ class application
         global $conn;
         $heading_id = get_querystring("id");
         //h1($heading_id);
-        $sql = "select * from headings where heading_id = $1"; // . $heading_id;
+        $sql = "select * from chieg.headings where heading_id = $1"; // . $heading_id;
         $stmt = uniqid();
         pg_prepare($conn,  $stmt, $sql);
         $result = pg_execute($conn,  $stmt, array($heading_id));
@@ -445,7 +445,7 @@ class application
     public function get_chapters()
     {
         global $conn;
-        $sql = "select id, description as title from chapters order by id;";
+        $sql = "select chapter as id, description as title from chieg.chapters order by chapter;";
         $result = pg_query($conn, $sql);
         if ($result) {
             while ($row = pg_fetch_array($result)) {
@@ -464,7 +464,7 @@ class application
     {
         global $conn;
         $sql = "select sssa.id as sid, sssa.section_id, ss.id, ss.step_description 
-        from signposting_step_section_assignment sssa, signposting_steps ss 
+        from chieg.signposting_step_section_assignment sssa, chieg.signposting_steps ss 
         where ss.id = sssa.signposting_step_id order by sssa.section_id, ss.id;";
         $result = pg_query($conn, $sql);
         if ($result) {
@@ -493,7 +493,7 @@ class application
     {
         global $conn;
         $sql = "select ssca.id as sid, chapter_id, ss.id, ss.step_description 
-        from signposting_step_chapter_assignment ssca, signposting_steps ss
+        from chieg.signposting_step_chapter_assignment ssca, chieg.signposting_steps ss
         where ss.id = ssca.signposting_step_id order by ssca.chapter_id, ss.id;";
         $result = pg_query($conn, $sql);
         if ($result) {
@@ -523,7 +523,7 @@ class application
     {
         global $conn;
         $sql = "select sstta.id as sid, sstta.trade_type, ss.id, ss.step_description 
-        from signposting_step_trade_type_assignment sstta , signposting_steps ss
+        from chieg.signposting_step_trade_type_assignment sstta, chieg.signposting_steps ss
         where ss.id = sstta.signposting_step_id order by sstta.trade_type ;";
         $result = pg_query($conn, $sql);
         if ($result) {
@@ -553,7 +553,7 @@ class application
     public function get_measure_types()
     {
         global $conn;
-        $sql = "select measure_type_id, description from measure_types order by 1;";
+        $sql = "select measure_type_id, description from chieg.measure_types order by 1;";
         $result = pg_query($conn, $sql);
         if ($result) {
             while ($row = pg_fetch_array($result)) {
@@ -571,7 +571,7 @@ class application
     public function get_measure_types2()
     {
         global $conn;
-        $sql = "select measure_type_id, description from measure_types where measure_type_series_id in ('A', 'B') order by 1;";
+        $sql = "select measure_type_id, description from chieg.measure_types where measure_type_series_id in ('A', 'B') order by 1;";
         $result = pg_query($conn, $sql);
         if ($result) {
             while ($row = pg_fetch_array($result)) {
@@ -591,7 +591,7 @@ class application
     {
         global $conn;
         $sql = "select ssmta.id as sid, ssmta.measure_type_id, ss.id, ss.step_description 
-        from signposting_step_measure_type_assignment ssmta, signposting_steps ss
+        from chieg.signposting_step_measure_type_assignment ssmta, chieg.signposting_steps ss
         where ss.id = ssmta.signposting_step_id order by ssmta.measure_type_id;";
         $result = pg_query($conn, $sql);
         if ($result) {
@@ -621,7 +621,7 @@ class application
     public function get_document_codes()
     {
         global $conn;
-        $sql = "select code, description from certificates order by 1;";
+        $sql = "select code, description from chieg.certificates order by 1;";
         $result = pg_query($conn, $sql);
         if ($result) {
             while ($row = pg_fetch_array($result)) {
@@ -641,7 +641,7 @@ class application
     {
         global $conn;
         $sql = "select ssdca.id as sid, ssdca.document_code, ss.id, ss.step_description 
-        from signposting_step_document_code_assignment ssdca, signposting_steps ss
+        from chieg.signposting_step_document_code_assignment ssdca, chieg.signposting_steps ss
         where ss.id = ssdca.signposting_step_id order by ssdca.document_code;";
         $result = pg_query($conn, $sql);
         if ($result) {
@@ -671,7 +671,7 @@ class application
     {
         global $conn;
         $sql = "select id, (order_index || '. ' || header_description) as description, trade_type
-        from signposting_step_headers order by order_index";
+        from chieg.signposting_step_headers order by order_index";
         $result = pg_query($conn, $sql);
         $this->headers = array();
         if ($result) {
@@ -694,7 +694,7 @@ class application
     {
         global $conn;
         $sql = "select sss.id, sss.subheader_description as description, sss.header_id, ssh.trade_type 
-        from signposting_step_subheaders sss, signposting_step_headers ssh 
+        from chieg.signposting_step_subheaders sss, chieg.signposting_step_headers ssh 
         where sss.header_id = ssh.id 
         order by ssh.order_index, sss.order_index";
         $result = pg_query($conn, $sql);
@@ -722,7 +722,7 @@ class application
 
         $sql = "with cte as (
         select ss.id, step_description, step_howto_description, step_url
-        from signposting_steps ss order by id
+        from chieg.signposting_steps ss order by id
         )
         select *, count(*) OVER() AS record_count from cte
         limit $this->page_size offset $this->page_size * ($this->page - 1);";
@@ -754,26 +754,27 @@ class application
 
         $sql = "with cte as (
         select sssa.id, signposting_step_id, 'Section ' || s.numeral as entity_id, 1 as priority, s.title as description, 'section' as link_type
-        from signposting_step_section_assignment sssa, sections s
+        from chieg.signposting_step_section_assignment sssa, chieg.sections s
         where sssa.section_id = s.id 
         union
-        select ssca.id, signposting_step_id, 'Chapter ' || c.id as entity_id, 2 as priority, c.description, 'chapter' as link_type
-        from signposting_step_chapter_assignment ssca, chapters c
-        where ssca.chapter_id = cast(c.id as int)
+        select ssca.id, signposting_step_id, 'Chapter ' || c.chapter as entity_id, 2 as priority, c.description, 'chapter' as link_type
+        from chieg.signposting_step_chapter_assignment ssca, chieg.chapters c
+        where ssca.chapter_id = cast(c.chapter as int)
         union
         select ssmta.id, signposting_step_id, 'Measure type ' || mt.measure_type_id as entity_id, 4 as priority, mt.description, 'measure_type' as link_type
-        from signposting_step_measure_type_assignment ssmta, measure_types mt
+        from chieg.signposting_step_measure_type_assignment ssmta, chieg.measure_types mt
         where ssmta.measure_type_id = mt.measure_type_id 
         union
         select ssdca.id, signposting_step_id, 'Document code ' || c.code as entity_id, 5 as priority, c.description, 'document_code' as link_type
-        from signposting_step_document_code_assignment ssdca, certificates c
+        from chieg.signposting_step_document_code_assignment ssdca, chieg.certificates c
         where ssdca.document_code = c.code
         union
         select ssca.id, ssca.signposting_step_id, 'Commodity ' || gn.goods_nomenclature_item_id as entity_id, 6 as priority, gn.description, 'commodity' as link_type
-        from signposting_step_commodity_assignment ssca, goods_nomenclatures gn 
+        from chieg.signposting_step_commodity_assignment ssca, chieg.goods_nomenclatures gn 
         where gn.goods_nomenclature_sid = ssca.goods_nomenclature_sid 
         )
         select * from cte where signposting_step_id in (" . $records . ") order by priority, id";
+        // pre($sql);
         $result = pg_query($conn, $sql);
         $this->content_linkage = array();
         $row_count = pg_num_rows($result);
@@ -810,7 +811,7 @@ class application
         $sql = "with cte as (
         select ssha.id, signposting_step_id, ssha.trade_type, ssha.header_id, ssha.subheader_id,
         ssh.header_description, sss.subheader_description, ssh.order_index as o1, sss.order_index as o2
-        from signposting_step_heading_assignment ssha, signposting_step_headers ssh, signposting_step_subheaders sss 
+        from chieg.signposting_step_heading_assignment ssha, chieg.signposting_step_headers ssh, chieg.signposting_step_subheaders sss 
         where ssha.header_id = ssh.id 
         and ssha.subheader_id = sss.id 
         )
@@ -985,7 +986,7 @@ class application
         $this->id = get_querystring("id");
 
         $command = uniqid();
-        $sql = "select * from signposting_steps ss
+        $sql = "select * from chieg.signposting_steps ss
         where ss.step_description ilike $1
         or ss.step_howto_description ilike $1
         or ss.step_url ilike $1
@@ -1050,7 +1051,7 @@ class application
         h1($user_name);
         $password = get_querystring("password");
         $password_encrypted = SA_Encryption::encrypt_to_url_param($password);
-        $sql = "select * from users where user_name = $1 and password = $2 limit 1";
+        $sql = "select * from chieg.users where user_name = $1 and password = $2 limit 1";
         $stmt = uniqid();
         pg_prepare($conn, $stmt, $sql);
         $result = pg_execute($conn, $stmt, array(

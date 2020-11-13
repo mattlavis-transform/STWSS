@@ -260,7 +260,7 @@ class commodity
         $sql = "with cte as (select m.measure_sid, m.measure_type_id, mt.description as measure_type_description,
         m.geographical_area_id, ga.description as geographical_area_description, mt.measure_type_series_id,
         case when mt.measure_type_series_id in ('A', 'B') then 'Regulatory' else 'Financial' end as measure_realm
-        from measures m, measure_association_goods_nomenclatures magn, measure_types mt, geographical_areas ga 
+        from chieg.measures m, chieg.measure_association_goods_nomenclatures magn, chieg.measure_types mt, chieg.geographical_areas ga 
         where m.measure_sid = magn.measure_sid 
         and magn.goods_nomenclature_sid = $1
         and m.is_import = true
@@ -291,7 +291,7 @@ class commodity
     {
         global $conn;
         $sql = "select distinct mc.document_code, mc.requirement 
-        from measure_conditions mc, measures m, measure_association_goods_nomenclatures magn 
+        from chieg.measure_conditions mc, chieg.measures m, chieg.measure_association_goods_nomenclatures magn 
         where mc.measure_sid = m.measure_sid 
         and m.measure_sid = magn.measure_sid 
         and magn.goods_nomenclature_sid = $1
@@ -316,7 +316,8 @@ class commodity
         global $conn;
         $sql = "select ssca.id as unique_id, ss.id, ss.step_description, ss.step_howto_description,
         ss.step_url, ss.header_id, ss.subheader_id, ssh.header_description, sss.subheader_description 
-        from signposting_step_commodity_assignment ssca, signposting_steps ss, signposting_step_headers ssh, signposting_step_subheaders sss 
+        from chieg.signposting_step_commodity_assignment ssca, chieg.signposting_steps ss, chieg.signposting_step_headers ssh,
+        chieg.signposting_step_subheaders sss 
         where ss.id = ssca.signposting_step_id 
         and ss.header_id = ssh.id 
         and ss.subheader_id = sss.id 
@@ -325,7 +326,7 @@ class commodity
 
         $sql = "select ssca.id as unique_id, ss.id, ss.step_description, ss.step_howto_description,
         ss.step_url
-        from signposting_step_commodity_assignment ssca, signposting_steps ss
+        from chieg.signposting_step_commodity_assignment ssca, chieg.signposting_steps ss
         where ss.id = ssca.signposting_step_id 
         and goods_nomenclature_sid = $1
         order by ss.id;";
@@ -369,7 +370,7 @@ class commodity
         global $app, $conn;
 
 
-        $sql = "select blob from goods_nomenclatures where goods_nomenclature_item_id = $1";
+        $sql = "select blob from chieg.goods_nomenclatures where goods_nomenclature_item_id = $1";
         $stmt = uniqid();
         pg_prepare($conn, $stmt, $sql);
         $result = pg_execute($conn, $stmt, array($this->goods_nomenclature_item_id));

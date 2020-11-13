@@ -51,7 +51,7 @@ class content
             $app->crumb_string = "Home|/;Content|/content;Content item " . $this->id . "|";
 
             $sql = "select id, step_description, step_howto_description, step_url
-            from signposting_steps ss where id = $1;";
+            from chieg.signposting_steps ss where id = $1;";
             pg_prepare($conn, "get_content", $sql);
             $result = pg_execute($conn, "get_content", array($this->id));
             $row_count = pg_num_rows($result);
@@ -64,7 +64,7 @@ class content
             }
             // Get the trade type links too
             $sql = "select trade_type, header_id, subheader_id
-            from signposting_step_heading_assignment where signposting_step_id = $1";
+            from chieg.signposting_step_heading_assignment where signposting_step_id = $1";
             $stmt = uniqid();
             pg_prepare($conn, $stmt, $sql);
             $result = pg_execute($conn, $stmt, array($this->id));
@@ -415,7 +415,7 @@ class content
             case "section":
                 $title = "Links to sections";
                 $sql = "select sssa.id, s.numeral as identifier, s.title as description, '/sections/view.html?id=' || s.id as view_url, 'section' as link_type
-                from signposting_step_section_assignment sssa, sections s
+                from chieg.signposting_step_section_assignment sssa, chieg.sections s
                 where s.id = sssa.section_id 
                 and signposting_step_id = $1
                 order by section_id ;";
@@ -424,11 +424,11 @@ class content
 
             case "chapter":
                 $title = "Links to chapters";
-                $sql = "select ssca.id, c.id as identifier, c.description, '/chapters/view.html?id=' || c.id as view_url, 'chapter' as link_type
-                from signposting_step_chapter_assignment ssca, chapters c
-                where cast(c.id as int) = ssca.chapter_id 
+                $sql = "select ssca.id, c.chapter as identifier, c.description, '/chapters/view.html?id=' || c.chapter as view_url, 'chapter' as link_type
+                from chieg.signposting_step_chapter_assignment ssca, chieg.chapters c
+                where cast(c.chapter as int) = ssca.chapter_id 
                 and signposting_step_id = $1
-                order by c.id ;";
+                order by c.chapter ;";
                 $link_url = "/content/link_02.html?link_type=chapter&id=" . $this->id;
                 break;
 
@@ -436,7 +436,7 @@ class content
                 $title = "Links to commodity codes";
                 $sql = "select ssca.id, gn.goods_nomenclature_item_id as identifier, gn.description,
                 '/commodities/view.html?goods_nomenclature_item_id=' || gn.goods_nomenclature_item_id as view_url, 'commodity' as link_type
-                from signposting_step_commodity_assignment ssca, goods_nomenclatures gn 
+                from chieg.signposting_step_commodity_assignment ssca, chieg.goods_nomenclatures gn 
                 where gn.goods_nomenclature_sid = ssca.goods_nomenclature_sid 
                 and signposting_step_id = $1
                 order by gn.goods_nomenclature_item_id;";
@@ -448,7 +448,7 @@ class content
                 $sql = "select ssmta.id, mt.measure_type_id as identifier, mt.description,
                 '/measure_types/view.html?id=' || mt.measure_type_id as view_url,
                 'measure_type' as link_type
-                from signposting_step_measure_type_assignment ssmta, measure_types mt
+                from chieg.signposting_step_measure_type_assignment ssmta, chieg.measure_types mt
                 where mt.measure_type_id = ssmta.measure_type_id 
                 and signposting_step_id = $1
                 order by mt.measure_type_id;"; // This is dummy code
@@ -459,7 +459,7 @@ class content
                 $title = "Links to document codes";
                 $sql = "select ssdca.id, c.code as identifier, c.description, '/document_codes/view.html?id=' || c.code as view_url,
                 'document_code' as link_type
-                from signposting_step_document_code_assignment ssdca, certificates c
+                from chieg.signposting_step_document_code_assignment ssdca, chieg.certificates c
                 where c.code = ssdca.document_code 
                 and signposting_step_id = $1
                 order by c.code;";
@@ -467,6 +467,7 @@ class content
                 break;
         }
         $command = uniqid();
+        //pre($sql);
         pg_prepare($conn, $command, $sql);
         $result = pg_execute($conn, $command, array($this->id));
         $this->linkage = array();
@@ -532,19 +533,19 @@ class content
 
         $sql = "with cte as (
         select sssa.id, signposting_step_id, 'Section ' || s.numeral as entity_id, 1 as priority, s.title as description, 'section' as link_type
-        from signposting_step_section_assignment sssa, sections s
+        from chieg.signposting_step_section_assignment sssa, chieg.sections s
         where sssa.section_id = s.id 
         union
-        select ssca.id, signposting_step_id, 'Chapter ' || c.id as entity_id, 2 as priority, c.description, 'chapter' as link_type
-        from signposting_step_chapter_assignment ssca, chapters c
-        where ssca.chapter_id = cast(c.id as int)
+        select ssca.id, signposting_step_id, 'Chapter ' || c.chapter as entity_id, 2 as priority, c.description, 'chapter' as link_type
+        from chieg.signposting_step_chapter_assignment ssca, chieg.chapters c
+        where ssca.chapter_id = cast(c.chapter as int)
         union
         select ssmta.id, signposting_step_id, 'Measure type ' || mt.measure_type_id as entity_id, 4 as priority, mt.description, 'measure_type' as link_type
-        from signposting_step_measure_type_assignment ssmta, measure_types mt
+        from chieg.signposting_step_measure_type_assignment ssmta, chieg.measure_types mt
         where ssmta.measure_type_id = mt.measure_type_id 
         union
         select ssdca.id, signposting_step_id, 'Document code ' || c.code as entity_id, 5 as priority, c.description, 'document_code' as link_type
-        from signposting_step_document_code_assignment ssdca, certificates c
+        from chieg.signposting_step_document_code_assignment ssdca, chieg.certificates c
         where ssdca.document_code = c.code
         )
         select count(*) as total_count from cte where cte.signposting_step_id = $1";
@@ -600,7 +601,7 @@ class content
 
         // Save the existing data to an audit table
         $sql = "insert into signposting_steps_history
-        select * from signposting_steps ss where ss.id = $1;";
+        select * from chieg.signposting_steps ss where ss.id = $1;";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         $result = pg_execute($conn, $command, array(

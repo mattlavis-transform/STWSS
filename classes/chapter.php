@@ -21,7 +21,7 @@ class chapter
             header("Location: " . $url);
         }
 
-        $sql = "select description from chapters where id = $1;";
+        $sql = "select description from chieg.chapters where chapter = $1;";
         pg_prepare($conn, "get_chapter", $sql);
         $result = pg_execute($conn, "get_chapter", array($this->id));
         $row_count = pg_num_rows($result);
@@ -39,7 +39,8 @@ class chapter
         global $conn;
         $sql = "select ssca.id as unique_id, ss.id, ss.step_description, ss.step_howto_description,
         ss.step_url, ss.header_id, ss.subheader_id, ssh.header_description, sss.subheader_description 
-        from signposting_step_chapter_assignment ssca, signposting_steps ss, signposting_step_headers ssh, signposting_step_subheaders sss 
+        from chieg.signposting_step_chapter_assignment ssca, chieg.signposting_steps ss, chieg.signposting_step_headers ssh,
+        chieg.signposting_step_subheaders sss 
         where ss.id = ssca.signposting_step_id 
         and ss.header_id = ssh.id 
         and ss.subheader_id = sss.id 
@@ -47,7 +48,7 @@ class chapter
         order by ss.id;";
         $sql = "select ssca.id as unique_id, ss.id, ss.step_description, ss.step_howto_description,
         ss.step_url
-        from signposting_step_chapter_assignment ssca, signposting_steps ss
+        from chieg.signposting_step_chapter_assignment ssca, chieg.signposting_steps ss
         where ss.id = ssca.signposting_step_id 
         and chapter_id = $1
         order by ss.id;";
