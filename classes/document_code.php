@@ -6,6 +6,10 @@ class document_code
     public $title           = "";
     public $description     = "";
     public $content         = array();
+    public $overlay         = "";
+    public $subtext         = "";
+    public $overlay_welsh   = "";
+    public $subtext_welsh   = "";
 
     public function populate()
     {

@@ -27,14 +27,22 @@ require("../includes/meta.php");
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
                     <h1 class="govuk-heading-l">Measure types</h1>
+                    <div class="govuk-inset-text">
+                        This page lists all of the measure types that are available to augment with
+                        user-centred content. Click on the measure type title to amend the overlay
+                        text in English and Welsh.
+                    </div>
                     <table class="govuk-table govuk-table--m sticky">
                         <caption class="govuk-table__caption">Current measure types</caption>
                         <thead class="govuk-table__head">
                             <tr class="govuk-table__row">
                                 <th scope="col" class="govuk-table__header">ID</th>
                                 <th scope="col" class="govuk-table__header">Description</th>
-                                <th scope="col" class="govuk-table__header">Actions</th>
-                                <th scope="col" class="govuk-table__header">Content assigned</th>
+                                <th scope="col" class="govuk-table__header">Overlay text</th>
+                                <th scope="col" class="govuk-table__header">Overlay text (Welsh)</th>
+                                <!-- <th scope="col" class="govuk-table__header r">Actions</th> -->
+                                <!-- <th scope="col" class="govuk-table__header">Actions</th>
+                                <th scope="col" class="govuk-table__header">Content assigned</th> -->
                             </tr>
                         </thead>
                         <tbody class="govuk-table__body">
@@ -42,9 +50,9 @@ require("../includes/meta.php");
                             foreach ($app->measure_types as $measure_type) {
                             ?>
                                 <tr class="govuk-table__row">
-                                    <td class="govuk-table__cell b" style="width:10%"><?= $measure_type->id ?></td>
-                                    <td class="govuk-table__cell" style="width:35%"><?= $measure_type->title ?></td>
-                                    <td class="govuk-table__cell nr" style="width:15%"><a href="view.html?id=<?= $measure_type->id ?>">View measure type</a></td>
+                                    <td class="govuk-table__cell b"><?= $measure_type->id ?></td>
+                                    <td class="govuk-table__cell"><a class='govuk-link' href="/measure_types/view.html?id=<?= $measure_type->id ?>"><?= $measure_type->title ?></a></td>
+                                    <!-- <td class="govuk-table__cell nr" style="width:15%"><a href="view.html?id=<?= $measure_type->id ?>">View measure type</a></td>
                                     <td class="govuk-table__cell" style="width:40%">
                                         <?php
                                         if (count($measure_type->content) > 0) {
@@ -60,8 +68,11 @@ require("../includes/meta.php");
                                             echo ("</ol>");
                                         }
                                         ?>
-                                        <div class="mt_0_5em"><a class="govuk-link" href="/content/add.html?link_type=measure_type&id=<?=$measure_type->id?>&sid=<?=$measure_type->id?>">Add content to measure type</a></div>
-                                    </td>
+                                        <div class="mt_0_5em"><a class="govuk-link" href="/content/add.html?link_type=measure_type&id=<?= $measure_type->id ?>&sid=<?= $measure_type->id ?>">Add content to measure type</a></div>
+                                    </td> -->
+                                    <td class="govuk-table__cell"><?= $measure_type->overlay ?></td>
+                                    <td class="govuk-table__cell"><?= $measure_type->overlay_welsh ?></td>
+                                    <!-- <td class="govuk-table__cell r" nowrap><a class='govuk-link' href="/measure_types/view.html?id=<?= $measure_type->id ?>">View / edit</a></td> -->
                                 </tr>
                             <?php
                             }

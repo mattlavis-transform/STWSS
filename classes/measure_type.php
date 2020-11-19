@@ -5,6 +5,12 @@ class measure_type
     public $id              = "";
     public $title           = "";
     public $description     = "";
+    public $overlay         = "";
+    public $subtext         = "";
+
+    public $overlay_welsh   = "";
+    public $subtext_welsh   = "";
+
     public $content         = array();
 
     public function populate()
@@ -17,7 +23,8 @@ class measure_type
             header("Location: " . $url);
         }
 
-        $sql = "select description from chieg.measure_types where measure_type_id = $1;";
+        $sql = "select description, overlay, subtext, overlay_welsh, subtext_welsh
+        from chieg.measure_types where measure_type_id = $1;";
         pg_prepare($conn, "get_measure_type", $sql);
         $result = pg_execute($conn, "get_measure_type", array($this->id));
         $row_count = pg_num_rows($result);
@@ -25,9 +32,13 @@ class measure_type
         if (($result) && ($row_count > 0)) {
             $row = pg_fetch_array($result);
             $this->description = $row['description'];
+            $this->overlay = $row['overlay'];
+            $this->subtext = $row['subtext'];
+            $this->overlay_welsh = $row['overlay_welsh'];
+            $this->subtext_welsh = $row['subtext_welsh'];
         }
 
-        $this->get_signposting_steps();
+        //$this->get_signposting_steps();
     }
 
     public function get_signposting_steps()

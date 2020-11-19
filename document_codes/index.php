@@ -27,14 +27,21 @@ require("../includes/meta.php");
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
                     <h1 class="govuk-heading-l">Document codes</h1>
+                    <div class="govuk-inset-text">
+                        This page lists all of the document codes that are available to augment with
+                        user-centred content. Click on the document code description to amend the overlay
+                        text in English and Welsh.
+                    </div>
                     <table class="govuk-table govuk-table--m sticky">
                         <caption class="govuk-table__caption">Current document codes</caption>
                         <thead class="govuk-table__head">
                             <tr class="govuk-table__row">
                                 <th scope="col" class="govuk-table__header">ID</th>
                                 <th scope="col" class="govuk-table__header">Description</th>
-                                <th scope="col" class="govuk-table__header">Actions</th>
-                                <th scope="col" class="govuk-table__header">Content assigned</th>
+                                <!-- <th scope="col" class="govuk-table__header">Actions</th>
+                                <th scope="col" class="govuk-table__header">Content assigned</th> -->
+                                <th scope="col" class="govuk-table__header">Overlay</th>
+                                <th scope="col" class="govuk-table__header">Overlay (Welsh)</th>
                             </tr>
                         </thead>
                         <tbody class="govuk-table__body">
@@ -42,10 +49,10 @@ require("../includes/meta.php");
                             foreach ($app->document_codes as $document_code) {
                             ?>
                                 <tr class="govuk-table__row">
-                                    <td class="govuk-table__cell b" style="width:10%"><?= $document_code->id ?></td>
-                                    <td class="govuk-table__cell" style="width:35%"><?= $document_code->title ?></td>
-                                    <td class="govuk-table__cell nr" style="width:15%"><a href="view.html?id=<?= $document_code->id ?>">View document code</a></td>
-                                    <td class="govuk-table__cell" style="width:40%">
+                                    <td class="govuk-table__cell b"><?= $document_code->id ?></td>
+                                    <td class="govuk-table__cell"><?= $document_code->title ?></td>
+                                    <!-- <td class="govuk-table__cell nr" style="width:15%"><a href="view.html?id=<?= $document_code->id ?>">View document code</a></td> -->
+                                    <!-- <td class="govuk-table__cell" style="width:40%">
                                         <?php
                                         if (count($document_code->content) > 0) {
                                             echo ('<ol class="govuk-list govuk-list--m govuk-list--number">');
@@ -60,8 +67,10 @@ require("../includes/meta.php");
                                             echo ("</ol>");
                                         }
                                         ?>
-                                        <div class="mt_0_5em"><a class="govuk-link" href="/content/add.html?link_type=document_code&id=<?=$document_code->id?>&sid=<?=$document_code->id?>">Add content to document code</a></div>
-                                    </td>
+                                        <div class="mt_0_5em"><a class="govuk-link" href="/content/add.html?link_type=document_code&id=<?= $document_code->id ?>&sid=<?= $document_code->id ?>">Add content to document code</a></div>
+                                    </td> -->
+                                    <td class="govuk-table__cell"><?= $document_code->overlay ?></td>
+                                    <td class="govuk-table__cell"><?= $document_code->overlay_welsh ?></td>
                                 </tr>
                             <?php
                             }

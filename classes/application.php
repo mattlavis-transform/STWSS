@@ -549,11 +549,19 @@ class application
         }
     }
 
+    public function hyphen($s)
+    {
+        if ($s == "") {
+            return ("-");
+        } else {
+            return ($s);
+        }
+    }
 
     public function get_measure_types()
     {
         global $conn;
-        $sql = "select measure_type_id, description from chieg.measure_types order by 1;";
+        $sql = "select measure_type_id, description, overlay, subtext, overlay_welsh, subtext_welsh from chieg.measure_types order by 1;";
         $result = pg_query($conn, $sql);
         if ($result) {
             while ($row = pg_fetch_array($result)) {
@@ -561,6 +569,10 @@ class application
                 $obj->id = $row['measure_type_id'];
                 $obj->title = $row['description'];
                 $obj->description = $row['measure_type_id'] . " - " . $row['description'];
+                $obj->overlay = $this->hyphen($row['overlay']);
+                $obj->subtext = $this->hyphen($row['subtext']);
+                $obj->overlay_welsh = $this->hyphen($row['overlay_welsh']);
+                $obj->subtext_welsh = $this->hyphen($row['subtext_welsh']);
 
                 array_push($this->measure_types, $obj);
             }
@@ -621,7 +633,8 @@ class application
     public function get_document_codes()
     {
         global $conn;
-        $sql = "select code, description from chieg.certificates order by 1;";
+        $sql = "select code, description, overlay, subtext, overlay_welsh, subtext_welsh
+        from chieg.certificates order by 1;";
         $result = pg_query($conn, $sql);
         if ($result) {
             while ($row = pg_fetch_array($result)) {
@@ -629,11 +642,15 @@ class application
                 $obj->id = $row['code'];
                 $obj->title = $row['description'];
                 $obj->description = $row['code'] . " - " . $row['description'];
+                $obj->overlay = $this->hyphen($row['overlay']);
+                $obj->subtext = $this->hyphen($row['subtext']);
+                $obj->overlay_welsh = $this->hyphen($row['overlay_welsh']);
+                $obj->subtext_welsh = $this->hyphen($row['subtext_welsh']);
 
                 array_push($this->document_codes, $obj);
             }
         }
-        $this->get_document_code_content();
+        //$this->get_document_code_content();
     }
 
 
@@ -893,9 +910,9 @@ class application
         $this->link_type = get_request("link_type");
         $this->sid = get_request("sid");
         $this->id = get_request("id");
-    
+
         //application::debug();
-    
+
         $this->content_linking_method = get_request("content_linking_method");
         if ($this->content_linking_method == "") {
             $errors = array();

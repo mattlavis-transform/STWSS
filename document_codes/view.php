@@ -130,7 +130,7 @@ require("../includes/meta.php");
                                 Update document code
                             </button>
                         </div>
-                        <div class="govuk-tabs__panel" id="content">
+                        <!-- <div class="govuk-tabs__panel" id="content"> -->
                             <h2 class="govuk-heading-l">Content</h2>
                             <?php
                             if (count($document_code->content) == 0) {
@@ -169,8 +169,8 @@ require("../includes/meta.php");
                             <?php
                             }
                             ?>
-                            <p class="govuk-body"><a href="/content/add.html?link_type=document_code&sid=<?= $document_code->id ?>&id=<?= $document_code->id ?>">Add content to document code <?= $document_code->id ?></a></p>
-                        </div>
+                            <!-- <p class="govuk-body"><a href="/content/add.html?link_type=document_code&sid=<?= $document_code->id ?>&id=<?= $document_code->id ?>">Add content to document code <?= $document_code->id ?></a></p> -->
+                        <!-- </div> -->
                     </div>
                 </div>
         </main>
