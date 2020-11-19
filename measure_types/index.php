@@ -26,7 +26,11 @@ require("../includes/meta.php");
         <main class="govuk-main-wrapper govuk-main-wrapper--auto-spacing" id="main-content" role="main">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
+<<<<<<< HEAD
                     <h1 class="govuk-heading-l">Measure types updated</h1>
+=======
+                    <h1 class="govuk-heading-l">Measure types Updated</h1>
+>>>>>>> a492f5e7e43cb05c4a432489ff723620ad10a0b3
                     <table class="govuk-table govuk-table--m sticky">
                         <caption class="govuk-table__caption">Current measure types</caption>
                         <thead class="govuk-table__head">
