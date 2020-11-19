@@ -78,7 +78,7 @@ require("../includes/meta.php");
                             </div>
                             <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"></textarea>
                             <form action="action.php">
-                                <input type="hidden" name="measure_type_id" id="measure_type_id" value="<?= $measure_type->id ?>">
+                                <input type="hidden" name="document_code_id" id="document_code_id" value="<?= $document_code->id ?>">
                                 <button class="govuk-button" data-module="govuk-button">
                                     Update document code
                                 </button>
@@ -125,7 +125,7 @@ require("../includes/meta.php");
                             <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"></textarea>
 
 
-                            <input type="hidden" name="measure_type_id" id="measure_type_id" value="<?= $measure_type->id ?>">
+                            <input type="hidden" name="document_code_id" id="document_code_id" value="<?= $document_code->id ?>">
                             <button class="govuk-button" data-module="govuk-button">
                                 Update document code
                             </button>
