@@ -23,6 +23,7 @@ class confirmation
         $this->data_encrypted = get_querystring("data");
         $this->data = SA_Encryption::decrypt_from_url_param($this->data_encrypted);
         $this->data_array = explode($app->delimiter, $this->data);
+        //prend($this->data_array);
         $this->panel_title = $this->data_array[0];
         $this->panel_body = $this->data_array[1];
         $this->step1 = $this->data_array[2];
