@@ -21,7 +21,8 @@ class document_code
             header("Location: " . $url);
         }
 
-        $sql = "select description from chieg.certificates where code = $1;";
+        $sql = "select description, overlay, subtext, overlay_welsh, subtext_welsh
+        from chieg.certificates where code = $1;";
         pg_prepare($conn, "get_document_code", $sql);
         $result = pg_execute($conn, "get_document_code", array($this->id));
         $row_count = pg_num_rows($result);
@@ -29,6 +30,10 @@ class document_code
         if (($result) && ($row_count > 0)) {
             $row = pg_fetch_array($result);
             $this->description = $row['description'];
+            $this->overlay = $row['overlay'];
+            $this->subtext = $row['subtext'];
+            $this->overlay_welsh = $row['overlay_welsh'];
+            $this->subtext_welsh = $row['subtext_welsh'];
         }
 
         $this->get_signposting_steps();

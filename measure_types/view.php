@@ -53,7 +53,7 @@ require("../includes/meta.php");
                         <tbody class="govuk-table__body">
                             <tr class="govuk-table__row">
                                 <th scope="row" class="govuk-table__cell">Measure type</td>
-                                <td class="govuk-table__cell">Chapter <?= $measure_type->id ?></td>
+                                <td class="govuk-table__cell"><?= $measure_type->id ?></td>
                             </tr>
                             <tr class="govuk-table__row">
                                 <th scope="row" class="govuk-table__cell">Description</td>
@@ -72,7 +72,7 @@ require("../includes/meta.php");
                         <div id="more-detail-hint" class="govuk-hint">
                             Optionally, you may override the measure type description for display within complex measures.
                         </div>
-                        <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"></textarea>
+                        <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"><?= $measure_type->overlay ?></textarea>
 
                         <h3 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="more-detail">
                                 Measure type subtext
@@ -81,7 +81,7 @@ require("../includes/meta.php");
                         <div id="more-detail-hint" class="govuk-hint">
                             Optionally, you may include additional text to help to explain the purpose of the measure type within complex measures.
                         </div>
-                        <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"></textarea>
+                        <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"><?= $measure_type->subtext ?></textarea>
 
                         <details class="govuk-details" data-module="govuk-details">
                             <summary class="govuk-details__summary">
@@ -97,7 +97,7 @@ require("../includes/meta.php");
                                 <div id="more-detail-hint" class="govuk-hint">
                                     Optionally, you may override the measure type description for display within complex measures (Welsh).
                                 </div>
-                                <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"></textarea>
+                                <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"><?= $measure_type->overlay_welsh ?></textarea>
 
                                 <h3 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="more-detail">
                                         Measure type subtext (Welsh)
@@ -106,7 +106,7 @@ require("../includes/meta.php");
                                 <div id="more-detail-hint" class="govuk-hint">
                                     Optionally, you may include additional text to help to explain the purpose of the measure type within complex measures (Welsh).
                                 </div>
-                                <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"></textarea>
+                                <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"><?= $measure_type->subtext_welsh ?></textarea>
 
                             </div>
                         </details>

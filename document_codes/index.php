@@ -50,7 +50,7 @@ require("../includes/meta.php");
                             ?>
                                 <tr class="govuk-table__row">
                                     <td class="govuk-table__cell b"><?= $document_code->id ?></td>
-                                    <td class="govuk-table__cell"><?= $document_code->title ?></td>
+                                    <td class="govuk-table__cell"><a href="/document_codes/view.html?id=<?= $document_code->id ?>"><?= $document_code->title ?></a></td>
                                     <!-- <td class="govuk-table__cell nr" style="width:15%"><a href="view.html?id=<?= $document_code->id ?>">View document code</a></td> -->
                                     <!-- <td class="govuk-table__cell" style="width:40%">
                                         <?php

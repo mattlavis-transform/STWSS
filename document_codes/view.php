@@ -28,7 +28,7 @@ require("../includes/meta.php");
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
                     <h1 class="govuk-heading-l">Document code <?= $document_code->id ?> - <?= $document_code->description ?></h1>
-                    <div class="govuk-tabs" data-module="govuk-tabs">
+                    <!-- <div class="govuk-tabs" data-module="govuk-tabs">
                         <h2 class="govuk-tabs__title">
                             Contents
                         </h2>
@@ -44,22 +44,188 @@ require("../includes/meta.php");
                                 </a>
                             </li>
                         </ul>
-                        <div class="govuk-tabs__panel" id="details">
-                            <h2 class="govuk-heading-l">About this document code</h2>
-                            <table class="govuk-table govuk-table--m">
-                                <tbody class="govuk-table__body">
-                                    <tr class="govuk-table__row">
-                                        <th scope="row" class="govuk-table__cell">Document code</td>
-                                        <td class="govuk-table__cell">Chapter <?= $document_code->id ?></td>
-                                    </tr>
-                                    <tr class="govuk-table__row">
-                                        <th scope="row" class="govuk-table__cell">Description</td>
-                                        <td class="govuk-table__cell"><?= $document_code->description ?></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="govuk-tabs__panel" id="details"> -->
+                    <h2 class="govuk-heading-l">About this document code</h2>
+                    <table class="govuk-table govuk-table--m">
+                        <tbody class="govuk-table__body">
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__cell">Document code</td>
+                                <td class="govuk-table__cell">Chapter <?= $document_code->id ?></td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__cell">Description</td>
+                                <td class="govuk-table__cell"><?= $document_code->description ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                            <h2 class="govuk-heading-m">Edit the document code</h2>
+                    <form action="action.php">
+                        <h2 class="govuk-heading-m">Edit the document code</h2>
+
+                        <h3 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="more-detail">
+                                Document code description overlay
+                            </label>
+                        </h3>
+                        <div id="more-detail-hint" class="govuk-hint">
+                            Optionally, you may override the document code description for display within complex measures.
+                        </div>
+                        <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"><?= $document_code->overlay ?></textarea>
+
+                        <h3 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="more-detail">
+                                Document code subtext
+                            </label>
+                        </h3>
+                        <div id="more-detail-hint" class="govuk-hint">
+                            Optionally, you may include additional text to provide more information about the document code within complex measures.
+                        </div>
+                        <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"><?= $document_code->subtext ?></textarea>
+
+                        <div class="govuk-form-group">
+                            <label class="govuk-label b" for="two-thirds">
+                                Link URL
+                            </label>
+                            <div id="more-detail-hint" class="govuk-hint">
+                                if you want to link to an external resource, specify that here. If you do not specify a Welsh URL,
+                                then this URL will also be used for the Welsh version.
+                            </div>
+                            <input class="govuk-input govuk-!-width-two-thirds" id="two-thirds" name="two-thirds" type="text">
+                        </div>
+
+                        <div class="govuk-form-group">
+                            <label class="govuk-label b" for="two-thirds">
+                                Link text
+                            </label>
+                            <div id="more-detail-hint" class="govuk-hint">
+                                If you specify a link, this is the text that will appear on that link.
+                            </div>
+                            <input class="govuk-input govuk-!-width-two-thirds" id="two-thirds" name="two-thirds" type="text">
+                        </div>
+
+                        <details class="govuk-details" data-module="govuk-details">
+                            <summary class="govuk-details__summary">
+                                <span class="govuk-details__summary-text">
+                                    Update Welsh content equivalents
+                                </span>
+                            </summary>
+                            <div class="govuk-details__text">
+                                <h3 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="more-detail">
+                                        Document code description overlay
+                                    </label>
+                                </h3>
+                                <div id="more-detail-hint" class="govuk-hint">
+                                    Optionally, you may override the document code description for display within complex measures.
+                                </div>
+                                <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"><?= $document_code->overlay_welsh ?></textarea>
+
+                                <h3 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="more-detail">
+                                        Document code subtext
+                                    </label>
+                                </h3>
+                                <div id="more-detail-hint" class="govuk-hint">
+                                    Optionally, you may include additional text to provide more information about the document code within complex measures.
+                                </div>
+                                <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"><?= $document_code->subtext_welsh ?></textarea>
+
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label b" for="two-thirds">
+                                        Link URL
+                                    </label>
+                                    <div id="more-detail-hint" class="govuk-hint">
+                                        Leave this blank to use the URL specified in the English version of the text.
+                                    </div>
+                                    <input class="govuk-input govuk-!-width-two-thirds" id="two-thirds" name="two-thirds" type="text">
+                                </div>
+
+
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label b" for="two-thirds">
+                                        Link text
+                                    </label>
+                                    <input class="govuk-input govuk-!-width-two-thirds" id="two-thirds" name="two-thirds" type="text">
+                                </div>
+
+
+                            </div>
+                        </details>
+
+
+                        <input type="hidden" name="document_code_id" id="document_code_id" value="<?= $document_code->id ?>">
+                        <button class="govuk-button" data-module="govuk-button">
+                            Update document code
+                        </button>
+                    </form>
+
+
+                    <h2 class="govuk-heading-xl govuk-!-margin-top-9">Error states</h2>
+                    <h2 class="govuk-heading-m">Edit the document code</h2>
+
+
+                    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+                        <h2 class="govuk-error-summary__title" id="error-summary-title">
+                            There is a problem
+                        </h2>
+                        <div class="govuk-error-summary__body">
+                            <ul class="govuk-list govuk-error-summary__list">
+                                <li>
+                                    <a href="#passport-issued-error">Enter the document code description overlay</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="govuk-form-group govuk-form-group--error">
+                        <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="more-detail">
+                                Document code description overlay
+                            </label>
+                        </h1>
+                        <div id="more-detail-hint" class="govuk-hint">
+                            Optionally, you may override the document code description for display within complex measures.
+                        </div>
+                        <span id="more-detail-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> Enter the document code description overlay
+                        </span>
+                        <textarea class="govuk-textarea govuk-textarea--error" id="more-detail" name="more-detail" rows="5" aria-describedby="more-detail-hint more-detail-error"></textarea>
+                    </div>
+
+                    <h3 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="more-detail">
+                            Document code subtext
+                        </label>
+                    </h3>
+                    <div id="more-detail-hint" class="govuk-hint">
+                        Optionally, you may include additional text to provide more information about the document code within complex measures.
+                    </div>
+                    <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"></textarea>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label b" for="two-thirds">
+                            Link URL
+                        </label>
+                        <div id="more-detail-hint" class="govuk-hint">
+                            if you want to link to an external resource, specify that here. If you do not specify a Welsh URL,
+                            then this URL will also be used for the Welsh version.
+                        </div>
+                        <input class="govuk-input govuk-!-width-two-thirds" id="two-thirds" name="two-thirds" type="text">
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label b" for="two-thirds">
+                            Link text
+                        </label>
+                        <div id="more-detail-hint" class="govuk-hint">
+                            If you specify a link, this is the text that will appear on that link.
+                        </div>
+                        <input class="govuk-input govuk-!-width-two-thirds" id="two-thirds" name="two-thirds" type="text">
+                    </div>
+
+
+
+
+                    <details class="govuk-details" data-module="govuk-details" open>
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                Update Welsh content equivalents
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
                             <h3 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="more-detail">
                                     Document code description overlay
                                 </label>
@@ -67,7 +233,7 @@ require("../includes/meta.php");
                             <div id="more-detail-hint" class="govuk-hint">
                                 Optionally, you may override the document code description for display within complex measures.
                             </div>
-                            <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"></textarea>
+                            <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"><?= $document_code->overlay_welsh ?></textarea>
 
                             <h3 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="more-detail">
                                     Document code subtext
@@ -76,104 +242,84 @@ require("../includes/meta.php");
                             <div id="more-detail-hint" class="govuk-hint">
                                 Optionally, you may include additional text to provide more information about the document code within complex measures.
                             </div>
-                            <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"></textarea>
-                            <form action="action.php">
-                                <input type="hidden" name="document_code_id" id="document_code_id" value="<?= $document_code->id ?>">
-                                <button class="govuk-button" data-module="govuk-button">
-                                    Update document code
-                                </button>
-                            </form>
+                            <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"><?= $document_code->subtext_welsh ?></textarea>
 
-
-                            <h2 class="govuk-heading-xl govuk-!-margin-top-9">Error states</h2>
-                            <h2 class="govuk-heading-m">Edit the document code</h2>
-
-
-                            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
-                                <h2 class="govuk-error-summary__title" id="error-summary-title">
-                                    There is a problem
-                                </h2>
-                                <div class="govuk-error-summary__body">
-                                    <ul class="govuk-list govuk-error-summary__list">
-                                        <li>
-                                            <a href="#passport-issued-error">Enter the document code description overlay</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="govuk-form-group govuk-form-group--error">
-                                <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="more-detail">
-                                        Document code description overlay
-                                    </label>
-                                </h1>
+                            <div class="govuk-form-group">
+                                <label class="govuk-label b" for="two-thirds">
+                                    Link URL
+                                </label>
                                 <div id="more-detail-hint" class="govuk-hint">
-                                    Optionally, you may override the document code description for display within complex measures.
+                                    Leave this blank to use the URL specified in the English version of the text.
                                 </div>
-                                <span id="more-detail-error" class="govuk-error-message">
-                                    <span class="govuk-visually-hidden">Error:</span> Enter the document code description overlay
-                                </span>
-                                <textarea class="govuk-textarea govuk-textarea--error" id="more-detail" name="more-detail" rows="5" aria-describedby="more-detail-hint more-detail-error"></textarea>
+                                <input class="govuk-input govuk-!-width-two-thirds" id="two-thirds" name="two-thirds" type="text">
                             </div>
 
-                            <h3 class="govuk-label-wrapper"><label class="govuk-label govuk-label--s" for="more-detail">
-                                    Document code subtext
+
+                            <div class="govuk-form-group">
+                                <label class="govuk-label b" for="two-thirds">
+                                    Link text
                                 </label>
-                            </h3>
-                            <div id="more-detail-hint" class="govuk-hint">
-                                Optionally, you may include additional text to provide more information about the document code within complex measures.
+                                <input class="govuk-input govuk-!-width-two-thirds" id="two-thirds" name="two-thirds" type="text">
                             </div>
-                            <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="2" aria-describedby="more-detail-hint"></textarea>
 
 
-                            <input type="hidden" name="document_code_id" id="document_code_id" value="<?= $document_code->id ?>">
-                            <button class="govuk-button" data-module="govuk-button">
-                                Update document code
-                            </button>
                         </div>
-                        <!-- <div class="govuk-tabs__panel" id="content"> -->
-                            <h2 class="govuk-heading-l">Content</h2>
+                    </details>
+
+
+
+
+
+
+                    <input type="hidden" name="document_code_id" id="document_code_id" value="<?= $document_code->id ?>">
+                    <button class="govuk-button" data-module="govuk-button">
+                        Update document code
+                    </button>
+                </div>
+                <!-- <div class="govuk-tabs__panel" id="content"> -->
+                <!-- <h2 class="govuk-heading-l">Content</h2>
+                <?php
+                if (count($document_code->content) == 0) {
+                    echo ("<p class='govuk-body'>There is no content attached to this document code.");
+                } else {
+                ?>
+                    <table class="govuk-table govuk-table--m">
+                        <thead class="govuk-table__head">
+                            <tr class="govuk-table__row">
+                                <th scope="col" class="govuk-table__header">ID</th>
+                                <th scope="col" class="govuk-table__header">Description</th>
+                                <th scope="col" class="govuk-table__header">Explanatory text</th>
+                                <th scope="col" class="govuk-table__header">URL</th>
+                                <th scope="col" class="govuk-table__header r">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="govuk-table__body">
                             <?php
-                            if (count($document_code->content) == 0) {
-                                echo ("<p class='govuk-body'>There is no content attached to this document code.");
-                            } else {
+                            foreach ($document_code->content as $c) {
                             ?>
-                                <table class="govuk-table govuk-table--m">
-                                    <thead class="govuk-table__head">
-                                        <tr class="govuk-table__row">
-                                            <th scope="col" class="govuk-table__header">ID</th>
-                                            <th scope="col" class="govuk-table__header">Description</th>
-                                            <th scope="col" class="govuk-table__header">Explanatory text</th>
-                                            <th scope="col" class="govuk-table__header">URL</th>
-                                            <th scope="col" class="govuk-table__header r">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="govuk-table__body">
-                                        <?php
-                                        foreach ($document_code->content as $c) {
-                                        ?>
-                                            <tr class="govuk-table__row">
-                                                <td class="govuk-table__cell"><?= $c->id ?></td>
-                                                <td class="govuk-table__cell"><?= $c->step_description ?></td>
-                                                <td class="govuk-table__cell"><?= $c->step_howto_description ?></td>
-                                                <td class="govuk-table__cell"><a target="_blank" href='<?= $c->step_url ?>'><?= $c->step_url ?></a></td>
-                                                <td class="govuk-table__cell r">
-                                                    <a class="govuk-link" href="/content/edit.html?id=<?= $c->id ?>" title="Edit content item <?= $c->id ?>"><i class="far fa-edit"></i></a>
-                                                    <a href="/includes/routes.php?action=delete_content_linkage&src=entity&link_type=document_code&id=<?= $document_code->id ?>&sid=<?= $c->unique_id ?>" title="Remove content item <?= $c->id ?> from document code <?= $document_code->id ?>"><i class='fas fa-trash-alt'></i></a>
-                                                </td>
-                                            </tr>
-                                        <?php
-                                        }
-                                        ?>
-                                    </tbody>
-                                </table>
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell"><?= $c->id ?></td>
+                                    <td class="govuk-table__cell"><?= $c->step_description ?></td>
+                                    <td class="govuk-table__cell"><?= $c->step_howto_description ?></td>
+                                    <td class="govuk-table__cell"><a target="_blank" href='<?= $c->step_url ?>'><?= $c->step_url ?></a></td>
+                                    <td class="govuk-table__cell r">
+                                        <a class="govuk-link" href="/content/edit.html?id=<?= $c->id ?>" title="Edit content item <?= $c->id ?>"><i class="far fa-edit"></i></a>
+                                        <a href="/includes/routes.php?action=delete_content_linkage&src=entity&link_type=document_code&id=<?= $document_code->id ?>&sid=<?= $c->unique_id ?>" title="Remove content item <?= $c->id ?> from document code <?= $document_code->id ?>"><i class='fas fa-trash-alt'></i></a>
+                                    </td>
+                                </tr>
                             <?php
                             }
                             ?>
-                            <!-- <p class="govuk-body"><a href="/content/add.html?link_type=document_code&sid=<?= $document_code->id ?>&id=<?= $document_code->id ?>">Add content to document code <?= $document_code->id ?></a></p> -->
-                        <!-- </div> -->
-                    </div>
-                </div>
-        </main>
+                        </tbody>
+                    </table> -->
+            <?php
+                }
+            ?>
+            <!-- <p class="govuk-body"><a href="/content/add.html?link_type=document_code&sid=<?= $document_code->id ?>&id=<?= $document_code->id ?>">Add content to document code <?= $document_code->id ?></a></p> -->
+            <!-- </div> -->
+            </div>
+    </div>
+    </main>
     </div>
     <?php
     require("../includes/footer.php");
