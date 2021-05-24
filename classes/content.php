@@ -356,7 +356,7 @@ class content
     public function unlink_section($sid)
     {
         global $conn;
-        $sql = "DELETE FROM signposting_step_section_assignment where id = $1";
+        $sql = "DELETE FROM chieg.signposting_step_section_assignment where id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         pg_execute($conn, $command, array(
@@ -367,7 +367,7 @@ class content
     public function unlink_chapter($sid)
     {
         global $conn;
-        $sql = "DELETE FROM signposting_step_chapter_assignment where id = $1";
+        $sql = "DELETE FROM chieg.signposting_step_chapter_assignment where id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         pg_execute($conn, $command, array(
@@ -378,7 +378,7 @@ class content
     public function unlink_commodity($sid)
     {
         global $conn;
-        $sql = "DELETE FROM signposting_step_commodity_assignment where id = $1";
+        $sql = "DELETE FROM chieg.signposting_step_commodity_assignment where id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         pg_execute($conn, $command, array(
@@ -389,7 +389,7 @@ class content
     public function unlink_measure_type($sid)
     {
         global $conn;
-        $sql = "DELETE FROM signposting_step_measure_type_assignment where id = $1";
+        $sql = "DELETE FROM chieg.signposting_step_measure_type_assignment where id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         pg_execute($conn, $command, array(
@@ -400,7 +400,7 @@ class content
     public function unlink_document_code($sid)
     {
         global $conn;
-        $sql = "DELETE FROM signposting_step_document_code_assignment where id = $1";
+        $sql = "DELETE FROM chieg.signposting_step_document_code_assignment where id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         pg_execute($conn, $command, array(
@@ -625,7 +625,7 @@ class content
         ));
 
         // Delete existing headers, trade type links etc.
-        $sql = "DELETE FROM signposting_step_trade_type_assignment
+        $sql = "DELETE FROM chieg.signposting_step_trade_type_assignment
         WHERE signposting_step_id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
@@ -973,7 +973,7 @@ class content
         }
 
         // Delete the country exlusions
-        $sql = "DELETE FROM signposting_step_country_exclusions WHERE signposting_step_id = $1";
+        $sql = "DELETE FROM chieg.signposting_step_country_exclusions WHERE signposting_step_id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         $result = pg_execute($conn, $command, array(
@@ -981,7 +981,7 @@ class content
         ));
 
         // Delete the section assignments
-        $sql = "DELETE FROM signposting_step_section_assignment WHERE signposting_step_id = $1";
+        $sql = "DELETE FROM chieg.signposting_step_section_assignment WHERE signposting_step_id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         $result = pg_execute($conn, $command, array(
@@ -989,7 +989,7 @@ class content
         ));
 
         // Delete the chapter assignments
-        $sql = "DELETE FROM signposting_step_chapter_assignment WHERE signposting_step_id = $1";
+        $sql = "DELETE FROM chieg.signposting_step_chapter_assignment WHERE signposting_step_id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         $result = pg_execute($conn, $command, array(
@@ -997,7 +997,7 @@ class content
         ));
 
         // Delete the commodity assignments
-        $sql = "DELETE FROM signposting_step_commodity_assignment WHERE signposting_step_id = $1";
+        $sql = "DELETE FROM chieg.signposting_step_commodity_assignment WHERE signposting_step_id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         $result = pg_execute($conn, $command, array(
@@ -1005,7 +1005,7 @@ class content
         ));
 
         // Delete the measure type assignments
-        $sql = "DELETE FROM signposting_step_measure_type_assignment WHERE signposting_step_id = $1";
+        $sql = "DELETE FROM chieg.signposting_step_measure_type_assignment WHERE signposting_step_id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         $result = pg_execute($conn, $command, array(
@@ -1013,7 +1013,7 @@ class content
         ));
 
         // Delete the document code assignments
-        $sql = "DELETE FROM signposting_step_document_code_assignment WHERE signposting_step_id = $1";
+        $sql = "DELETE FROM chieg.signposting_step_document_code_assignment WHERE signposting_step_id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         $result = pg_execute($conn, $command, array(
@@ -1021,7 +1021,7 @@ class content
         ));
 
         // Delete the trade type assignments
-        $sql = "DELETE FROM signposting_step_trade_type_assignment WHERE signposting_step_id = $1";
+        $sql = "DELETE FROM chieg.signposting_step_trade_type_assignment WHERE signposting_step_id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         $result = pg_execute($conn, $command, array(
@@ -1029,7 +1029,7 @@ class content
         ));
 
         // Delete the content itself
-        $sql = "DELETE FROM signposting_steps WHERE id = $1";
+        $sql = "DELETE FROM chieg.signposting_steps WHERE id = $1";
         $command = uniqid();
         pg_prepare($conn, $command, $sql);
         $result = pg_execute($conn, $command, array(

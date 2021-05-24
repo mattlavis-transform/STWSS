@@ -190,8 +190,8 @@ require("../includes/meta.php");
                                     $content->get_linkages("section");
                                     $content->get_linkages("chapter");
                                     $content->get_linkages("commodity");
-                                    $content->get_linkages("measure_type");
-                                    $content->get_linkages("document_code");
+                                    // $content->get_linkages("measure_type");
+                                    // $content->get_linkages("document_code");
                                     ?>
                                 </div>
                             <?php

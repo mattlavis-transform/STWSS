@@ -38,15 +38,15 @@ require("./includes/meta.php");
                     <h2 class="govuk-heading-m">Tariff entities</h2>
                     <p class="govuk-body"><a href="/sections">Sections</a></p>
                     <p class="govuk-body"><a href="/chapters">Chapters</a></p>
-                    <p class="govuk-body"><a href="/commodities">Commodity codes</a></p>
+                    <!-- <p class="govuk-body"><a href="/commodities">Commodity codes</a></p> -->
                     <p class="govuk-body"><a href="/measure_types">Measure types</a></p>
                     <p class="govuk-body"><a href="/document_codes">Document codes</a></p>
                     <!--<p class="govuk-body"><a href="/trade_types">Trade types</a></p>//-->
                 </div>
-                <div class="govuk-grid-column-one-third">
+                <!-- <div class="govuk-grid-column-one-third">
                     <h2 class="govuk-heading-m">Tariff data exploration</h2>
                     <p class="govuk-body"><a href="/explore">Explore the trade tariff</a></p>
-                </div>
+                </div> -->
             </div>
         </main>
     </div>
